@@ -1,2 +1,6 @@
 # profilers
 *.prof
+
+# pycache
+__pycache__
+*.pyc
