@@ -25,7 +25,18 @@ class Hand:
         hand.append(card)
 
         # update can_split
-        if(len(hand) == 2 and hand[0] == hand[1]): hand.can_split = True
+        # this try/except is much faster than running len()
+        try:
+            hand[1]
+        except IndexError:
+            # Here if there is only 1 card
+            return 0
+        
+        try:
+            hand[2]
+        except IndexError:
+            # here if there are not 3 cards, therefore 2 cards
+            if(hand[0] == hand[1]): hand.can_split = True
 
         return 0
 
@@ -170,7 +181,6 @@ class Hand:
 # Collection of Cards (Collection of ints)
 class Deck:
     def __init__(self, *cards: int) -> None:
-        self.original_order_cards: list[int] = []
         self.cards: list[int] = []
 
         self.can_hit: bool = True
@@ -180,9 +190,7 @@ class Deck:
         self.can_blackjack: bool = True
         self.active: bool = True
 
-        self.original_order_cards: list[int] = []
         self.cards.extend(cards)
-        self.sort()
 
     def __getitem__(self, index) -> int:
         return self.cards[index]
@@ -195,39 +203,23 @@ class Deck:
     
     def clear(self) -> None:
         self.cards.clear()
-        self.original_order_cards.clear()
 
     def append(self, card: int) -> None:
         self.cards.append(card)
-        self.sort()
-        self.original_order_cards.append(card)
 
     def count_aces(self) -> int:
-        out = 0
-
-        for card in self.cards:
+        num_aces = 0
+        for index, card in enumerate(self.cards):
             if(card == 11):
-                out += 1
-            else:
-                # we can return because list is sorted by high cards, any non-ace is always after all other aces
-                return out
-        return out
-
-    # removes all but one ace
-    def remove_aces(self, n: int) -> None:
-        for i in range(0, n-1):
-            self.cards[i] = 1
-
-        self.sort()
+                if(num_aces == 1):
+                    self.cards[index] = 1
+                else:
+                    num_aces += 1
+        return num_aces
 
     def get_value(self) -> int:
         num_aces = self.count_aces()
         out = 0
-
-        # Only one ace can be an 11 in any given blackjack hand
-        if(num_aces > 1):
-            self.remove_aces(num_aces)
-            num_aces = 1
 
         # first pass
         for card in self.cards:
@@ -240,7 +232,6 @@ class Deck:
         
         # since we've gotten here, we know there is one ace
         # if we turn that aces value to 1 instead of 11, that is the same as just subtracting 10 from the total
-
         return (out - 10)
     
     def is_bust(self) -> bool:
@@ -254,9 +245,9 @@ class Deck:
     def __str__(self) -> str:
         if(len(self) == 0): return "[]"
 
-        out = f"[{card_to_str(self.original_order_cards[0])}"
+        out = f"[{card_to_str(self.cards[0])}"
 
-        for card in self.original_order_cards[1:]:
+        for card in self.cards[1:]:
             out += ", "
             out += card_to_str(card)
 
