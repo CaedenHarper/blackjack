@@ -170,3 +170,7 @@ cython_debug/
 # Stackdumps
 *.exe.stackdump
 *.stackdump
+
+# VSCode
+# Settings
+.vscode/
