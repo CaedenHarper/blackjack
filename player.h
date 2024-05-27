@@ -4,15 +4,16 @@
 #include <iostream>
 #include <vector>
 #include <hand.h>
+#include <shoe.h>
 
 class Player {
     public:
     std::vector<Hand> hands;
 
     Player();
-    Hand operator [](int i);
+    Hand operator [](int i) const;
     friend std::ostream& operator<<(std::ostream &out, const Player &player);
-    int size();
+    int size() const;
     int add(Shoe& shoe);
     int add(Shoe& shoe, int index);
     int hit(Shoe& shoe);
@@ -27,7 +28,7 @@ class Player {
     int surrender(int index);
     int get_value();
     int get_value(int index);
-    bool is_active();
+    std::vector<int> get_active_indices();
     bool all_busted(); 
 };
 

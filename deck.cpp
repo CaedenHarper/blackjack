@@ -1,43 +1,27 @@
 #include <iostream>
 #include <vector>
-#include <numeric>
 #include <deck.h>
 
 Deck :: Deck() {
-    std::vector<int> cards;
-    bool can_hit = true;
-    bool can_double = true;
-    bool can_split = false;
-    bool can_surrender = false;
-    bool can_blackjack = true;
-    bool active = true;
+    cards;
 }
 
-Deck :: Deck(int card) {
-    std::vector<int> cards = {card};
-    bool can_hit = true;
-    bool can_double = true;
-    bool can_split = false;
-    bool can_surrender = false;
-    bool can_blackjack = true;
-    bool active = true;
+Deck :: Deck(int _card) {
+    cards = {_card};
 }
 
-Deck :: Deck(std::vector<int> c) {
-    std::vector<int> cards(c);
-    bool can_hit = true;
-    bool can_double = true;
-    bool can_split = false;
-    bool can_surrender = false;
-    bool can_blackjack = true;
-    bool active = true;
+Deck :: Deck(std::vector<int> _cards) {
+    cards = _cards;
 }
 
-int Deck :: operator [](int i) {
+int Deck :: operator [](int i) const {
+    if(cards.size() < 1) {
+        std::cout << "EMPTY DECK ERROR" << "\n";
+    }
     return cards[i];
 }
 
-std::ostream& operator<<(std::ostream &out, Deck &deck) {
+std::ostream& operator<<(std::ostream &out, const Deck &deck) {
     if(deck.size() == 0) {
         out << "[]";
         return out;
@@ -52,12 +36,17 @@ std::ostream& operator<<(std::ostream &out, Deck &deck) {
     return out;
 }
 
-int Deck :: size() {
+int Deck :: size() const {
     return cards.size();
 }
 
 void Deck :: clear() {
     cards.clear();
+}
+
+void Deck :: insert(int index, const int& val) {
+    std::vector<int>::iterator it = cards.begin();
+    cards.insert((it + index), val);
 }
 
 void Deck :: push_back(const int& val) {

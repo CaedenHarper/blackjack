@@ -11,10 +11,11 @@ class Deck {
     Deck();
     Deck(int card);
     Deck(std::vector<int> cards);
-    int operator [](int i);
+    int operator [](int i) const;
     friend std::ostream& operator<<(std::ostream &out, const Deck &deck);
-    int size();
+    int size() const;
     void clear();
+    void insert(int index, const int& val);
     void push_back(const int& val);
     int pop_back();
 };
