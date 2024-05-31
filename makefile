@@ -23,3 +23,4 @@ player.o: player.cpp
 clean:
 	rm -rf *.o
 	rm -rf main.exe
+	rm -rf main.exe.stackdump
