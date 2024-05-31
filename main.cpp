@@ -47,7 +47,7 @@ action basic_strategy(Hand const hand) {
     constexpr bool PRINT_STATS = true;
 
     constexpr int MAX_DECKS = 8;
-    constexpr int MAX_HANDS = 100000000;      // 1000000 = 1,000,000 = 1 million
+    constexpr int MAX_HANDS = 1000000;      // 1000000 = 1,000,000 = 1 million
     constexpr float PENETRATON_PERCENT = 0.25;
     constexpr int PENETRATION_CARDS = DECK_SIZE * MAX_DECKS * PENETRATON_PERCENT;
 
@@ -278,11 +278,36 @@ action basic_strategy(Hand const hand) {
 
         std::cout << "DEALER BJs = " << dealer_blackjacks << " -> " << dealer_blackjacks*1.0/total * 100 << "%\n";
         std::cout << "PLAYER BJs = " << player_blackjacks << " -> " << player_blackjacks*1.0/total * 100 << "%\n\n";
+        
+        float profit = BETTING_UNIT * player_profit;
+        float profit_per_hour = (profit) / (total*1.0 / HANDS_PER_HOUR);
+
+        // define sign chars to print dollar sign prettier
+        // e.g., -$400 instead of $-400
+        char profit_sign;
+        if(profit < 0) {
+            // if negative, turn positive and assign negative sign
+            profit *= -1;
+            profit_sign = '-';
+        } else {
+            // if non-negative, assign no sign
+            profit_sign = '\0';
+        }
+
+        char profit_per_hour_sign;
+        if(profit_per_hour < 0) {
+            // if negative, turn positive and assign negative sign
+            profit_per_hour *= -1;
+            profit_per_hour_sign = '-';
+        } else {
+            // if non-negative, assign no sign
+            profit_per_hour_sign = '\0';
+        }
 
         std::cout << "PLAYER PROFIT:\n";
         std::cout << "-> " << player_profit << " betting units\n";
-        std::cout << "-> $" << BETTING_UNIT*player_profit << "\n";
-        std::cout << "-> $" << (BETTING_UNIT*player_profit) / (total*1.0 / HANDS_PER_HOUR) << "/hr\n\n";
+        std::cout << "-> " << profit_sign << "$" << profit << "\n";
+        std::cout << "-> " << profit_per_hour_sign << "$" << profit_per_hour << "/hr\n\n";
 
         std::cout << std::chrono::duration<double, std::milli>(diff).count() *1.0 / 1000     << " seconds" << std::endl;
     }
