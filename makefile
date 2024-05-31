@@ -3,7 +3,7 @@ CFLAGS = -c -O2
 all: prog
 
 prog: main.o deck.o hand.o shoe.o player.o
-	g++ -o main -g main.o deck.o hand.o shoe.o player.o -I.
+	g++ -O2 -o main -g main.o deck.o hand.o shoe.o player.o -I.
 
 main.o: main.cpp
 	g++ ${CFLAGS} main.cpp -I.

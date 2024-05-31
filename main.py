@@ -2,7 +2,7 @@ from Blackjack import Hand, Shoe
 
 def main():
     # init
-    shoe = Shoe(1_000_000, True)
+    shoe = Shoe(50_000, True)
 
     total = 0
     win = 0
@@ -53,8 +53,11 @@ def main():
                 #print("Player bust.")
                 continue
             
-            result = player_hand.hit(shoe, current_index)
-            if(result == -1): player_hand.stand(current_index)
+            if(player_value < 17):
+                result = player_hand.hit(shoe, current_index)
+                if(result == -1): player_hand.stand(current_index)
+            else:
+                player_hand.stand(current_index)
 
             # choice = ""
             # while True:

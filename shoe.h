@@ -8,10 +8,16 @@
 class Shoe : public Deck {
     public:
     int num_decks;
+    static std::default_random_engine rng;
+
+    const static std::vector<int> one_deck;
+    const static std::vector<int> two_decks;
+    const static std::vector<int> four_decks;
+    const static std::vector<int> six_decks;
+    const static std::vector<int> eight_decks;
     
     Shoe(int n_decks);
-    Shoe(int n_decks, std::default_random_engine rng);
-    void shuffle(std::default_random_engine rng);
+    void shuffle();
 };
 
 #endif

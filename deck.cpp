@@ -29,7 +29,11 @@ std::ostream& operator<<(std::ostream &out, const Deck &deck) {
 
     out << "[" << deck[0];
     for(int i = 1; i < deck.size(); i++) {
-        out << ", " << deck[i];
+        if(deck[i] == 11) {
+            out << ", " << "A";
+        } else {
+            out << ", " << deck[i];
+        }
     }
     out << "]";
 
