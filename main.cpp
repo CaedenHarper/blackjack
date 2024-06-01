@@ -75,9 +75,9 @@ constexpr float PENETRATON_PERCENT = 0.25;
 // MONEY SETTINGS
 
 // Amount of dollars per smallest bet
-constexpr int BETTING_UNIT = 5;
+constexpr int BETTING_UNIT = 100;
 // Number of hands played per hour
-constexpr int HANDS_PER_HOUR = 250;
+constexpr int HANDS_PER_HOUR = 100;
 
 // TODO: properly comment
 enum action {
@@ -171,7 +171,7 @@ action basic_strategy(Hand const player_hand) {
         // Useful dealer constants
         const int dealer_upcard = dealer[0][0];
         const int dealer_init_value = dealer.get_value();
-        Hand* dealer_hand = &dealer.hands[0];
+        Hand* p_dealer_hand = &dealer.hands[0];
 
         // Has the dealer gotten a blackjack
         bool dealer_blackjack = false;
@@ -190,10 +190,10 @@ action basic_strategy(Hand const player_hand) {
             // For some reason player.hands[index] is required because
             // player[index] throws an error even though player[index] simply returns
             // player.hands[index]... eventually fix this
-            Hand* current_hand = &player.hands[current_index];
+            Hand* p_current_hand = &player.hands[current_index];
 
             // populate hand if necessary
-            while(current_hand->size() < 2) player.add(shoe, current_index);
+            while(p_current_hand->size() < 2) player.add(shoe, current_index);
 
             int player_value = player.get_value(current_index);
             
@@ -208,18 +208,18 @@ action basic_strategy(Hand const player_hand) {
                 break;
             }
             if(player_value == 21) {
-                current_hand->set_active(false);
+                p_current_hand->set_active(false);
                 continue;
             }
             
             // handle bust
             if(player_value > 21) {
-                current_hand->set_active(false);
+                p_current_hand->set_active(false);
                 continue;
             }
 
             action player_action = dealer_strategy(player[current_index]);
-            // action player_action = basic_strategy(player[current_index]);
+            // action player_action = basic_strategy(*p_current_hand);
             // TODO: consider wrapping in a function
             switch (player_action) {
             case hit:
@@ -251,7 +251,7 @@ action basic_strategy(Hand const player_hand) {
             // exit loop if all players have busted
             if(all_busted) break;
 
-            action dealer_action = dealer_strategy(*dealer_hand);
+            action dealer_action = dealer_strategy(*p_dealer_hand);
 
             // exit loop if dealer stands
             if(dealer_action == stand) break;
@@ -259,7 +259,7 @@ action basic_strategy(Hand const player_hand) {
             dealer.hit(shoe);
 
             // exit loop if dealer busts
-            if(dealer_hand->is_bust()) break;
+            if(p_dealer_hand->is_bust()) break;
 
             if(DEBUG) std::cout << dealer.get_value() << " -> " << dealer << "\n";
         }
@@ -273,12 +273,12 @@ action basic_strategy(Hand const player_hand) {
             // For some reason player.hands[index] is required because
             // player[index] throws an error even though player[index] simply returns
             // player.hands[index]... eventually fix this
-            Hand* hand = &player.hands[i];
-            int value = hand->get_value();
+            Hand* p_hand = &player.hands[i];
+            int value = p_hand->get_value();
 
             // winner logic
             // push
-            if(dealer_blackjack && hand->is_blackjack()) {
+            if(dealer_blackjack && p_hand->is_blackjack()) {
                 total++;
                 draw++;
                 dealer_blackjacks++;
@@ -300,7 +300,7 @@ action basic_strategy(Hand const player_hand) {
             }
 
             // win
-            if(hand->is_blackjack()) {
+            if(p_hand->is_blackjack()) {
                 total++;
                 win++;
                 player_blackjacks++;
@@ -312,7 +312,7 @@ action basic_strategy(Hand const player_hand) {
             }
 
             // loss
-            if(hand->is_bust()) {
+            if(p_hand->is_bust()) {
                 total++;
                 loss++;
 
