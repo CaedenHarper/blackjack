@@ -27,8 +27,15 @@ std::ostream& operator<<(std::ostream &out, const Deck &deck) {
         return out;
     }
 
-    out << "[" << deck[0];
+    // TODO: consider changing writing A instead of 11 method
+    // write A instead of 11
+    if(deck[0] == 11) {
+        out << "[" << "A";
+    } else {
+        out << "[" << deck[0];
+    }
     for(int i = 1; i < deck.size(); i++) {
+        // write A instead of 11
         if(deck[i] == 11) {
             out << ", " << "A";
         } else {

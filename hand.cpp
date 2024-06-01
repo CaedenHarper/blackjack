@@ -43,7 +43,13 @@ std::ostream& operator<<(std::ostream &out, Hand const &hand) {
         return out;
     }
 
-    out << "[" << hand[0];
+    // TODO: consider changing writing A instead of 11 method
+    // write A instead of 11
+    if(hand[0] == 11) {
+        out << "[" << "A";
+    } else {
+        out << "[" << hand[0];
+    }
     for(int i = 1; i < hand.size(); i++) {
         if(hand[i] == 11) {
             out << ", " << "A";
