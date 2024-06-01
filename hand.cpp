@@ -2,6 +2,7 @@
 #include <vector>
 #include <numeric>
 #include <hand.h>
+// TODO: add pointer prefix to all hand pointers in file
 
 Hand :: Hand() : Deck() {
     value = 0;
