@@ -1,24 +1,26 @@
-CFLAGS = -c -O2
+COMPILE_FLAGS = -c
+ALL_FLAGS = -O2 -I.
+
 
 all: prog
 
 prog: main.o deck.o hand.o shoe.o player.o
-	g++ -O2 -o main -g main.o deck.o hand.o shoe.o player.o -I.
+	g++ ${ALL_FLAGS} -o main -g main.o deck.o hand.o shoe.o player.o
 
 main.o: main.cpp
-	g++ ${CFLAGS} main.cpp -I.
+	g++ ${ALL_FLAGS} ${COMPILE_FLAGS} main.cpp
 
 deck.o: deck.cpp
-	g++ ${CFLAGS} deck.cpp -I.
+	g++ ${ALL_FLAGS} ${COMPILE_FLAGS} deck.cpp
 
 hand.o: hand.cpp
-	g++ ${CFLAGS} hand.cpp -I.
+	g++ ${ALL_FLAGS} ${COMPILE_FLAGS} hand.cpp
 
 shoe.o: shoe.cpp
-	g++ ${CFLAGS} shoe.cpp -I.
+	g++ ${ALL_FLAGS} ${COMPILE_FLAGS} shoe.cpp
 
 player.o: player.cpp
-	g++ ${CFLAGS} player.cpp -I.
+	g++ ${ALL_FLAGS} ${COMPILE_FLAGS} player.cpp
 
 clean:
 	rm -rf *.o
