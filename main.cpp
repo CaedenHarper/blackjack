@@ -14,6 +14,7 @@
 #include <shoe.h>
 #include <player.h>
 
+// TODO: properly comment
 enum action {
     hit,
     stand,
@@ -22,15 +23,17 @@ enum action {
     surrender
 };
 
+// TODO: properly comment
 action dealer_strategy(Hand const hand) {
     const int value = hand.get_value();
     if(value < 17) {
         return hit;
-    } else {
-        return stand;
     }
+
+    return stand;
 }
 
+// TODO: properly comment
 action basic_strategy(Hand const hand) {
     const int value = hand.get_value();
     const bool can_double = hand.get_can_double();
@@ -41,25 +44,81 @@ action basic_strategy(Hand const hand) {
 }
 
  int main() {
-    constexpr int DECK_SIZE = 52;
+    // PROGRAM SETTINGS
 
+    // print debug information throughout the simulation
     constexpr bool DEBUG = false;
+    // print stats at the end of the simulation
     constexpr bool PRINT_STATS = true;
 
-    constexpr int MAX_DECKS = 8;
-    constexpr int MAX_HANDS = 1000000;      // 1000000 = 1,000,000 = 1 million
-    constexpr float PENETRATON_PERCENT = 0.25;
-    constexpr int PENETRATION_CARDS = DECK_SIZE * MAX_DECKS * PENETRATON_PERCENT;
 
+    // BLACKJACK RULE VARIATIONS
+
+    // Amount to payout when player gets a blackjack
+    // (e.g., if 1.5, 3:2 payout)
+    constexpr float BLACKJACK_PAYOUT = 1.5;
+    // Number of decks in play
+    // (e.g., if 2, Double Deck)
+    constexpr int MAX_DECKS = 8;
+    // If player can late surrender
+    // note: early surrender takes precedence over late surrender
+    // (e.g., if early and late are both true, player can early surrender)
+    // TODO: implement
+    constexpr bool LATE_SURRENDER = false;
+    // If player can early surrender
+    // note: early surrender takes precedence over late surrender
+    // (e.g., if early and late are both true, player can early surrender)
+    // TODO: implement
+    constexpr bool EARLY_SURRENDER = false;
+    // If dealer hits soft seventeen
+    // (e.g., if false, dealer stands on A-6)
+    // TODO: implement
+    constexpr bool HIT_SOFT_SEVENTEEN = true;
+    // If player can double after split
+    constexpr bool DOUBLE_AFTER_SPLIT = true;
+    // If player can split aces
+    // TODO: implement
+    constexpr bool SPLIT_ACES = true;
+    // If player can act on split aces
+    // (e.g., if false, player will be given one card and can not act further)
+    // TODO: implement
+    constexpr bool DRAW_TO_SPLIT_ACES = false;
+    // Total number of hands aces can be split to
+    // (e.g., if 2, player can split aces to 2 hands total)
+    // TODO: implement
+    constexpr int SPLIT_ACES_NUM = 2;
+    // Total number of hands any non-ace can be split to
+    // (e.g., if 4, player can split tens to 4 hands total)
+    // TODO: implement
+    constexpr int SPLIT_NUM = 4;
+
+
+    // SIMULATION SETTINGS
+
+    // Total number of hands to play in simulation
+    // (e.g., 1000000 = 1,000,000 = 1 million, 1 million hands are played)
+    constexpr int MAX_HANDS = 1000000;
+    // Percentage of deck to stop dealing at
+    constexpr float PENETRATON_PERCENT = 0.25;
+
+
+    // MONEY SETTINGS
+
+    // Amount of dollars per smallest bet
     constexpr int BETTING_UNIT = 5;
+    // Number of hands played per hour
     constexpr int HANDS_PER_HOUR = 250;
 
     auto start = std::chrono::steady_clock::now();
 
-    // init shoe
+    // Shoe for simulation
     Shoe shoe = Shoe(MAX_DECKS);
+    // Total amount of cards in one deck -- (almost) always constant
+    const int ONE_DECK_SIZE = shoe.one_deck.size();
+    // Amount of cards to stop dealing when reached
+    const int PENETRATION_CARDS = ONE_DECK_SIZE * MAX_DECKS * PENETRATON_PERCENT;
 
-    // init statistic vars
+    // Statistic variables
     int total = 0;
     int win = 0;
     int loss = 0;
@@ -67,24 +126,28 @@ action basic_strategy(Hand const hand) {
     int player_blackjacks = 0;
     int dealer_blackjacks = 0;
 
+    // Total player profit
+    // TODO: replace with bankroll, bet spread, true count, etc.
     float player_profit = 0;
 
-    // TODO: Consider defining changing variables outside of the loop
-    // round loops
+    // Simulation loop
     while(total < MAX_HANDS) {
         if(shoe.size() <= PENETRATION_CARDS) shoe = Shoe(MAX_DECKS);  
-        // init players
+        // Player variables
         Player player = Player();
         Player dealer = Player();
 
+        // Populate initial hands
         player.add(shoe);
         dealer.add(shoe);
         player.add(shoe);
         dealer.add(shoe);
         
-        // init dealer values
+        // Useful dealer constants
         const int dealer_upcard = dealer[0][0];
         const int dealer_init_value = dealer.get_value();
+
+        // Has the dealer gotten a blackjack
         bool dealer_blackjack = false;
 
         if(DEBUG) std::cout << "--PLAYER LOOP--" << "\n";
@@ -196,7 +259,9 @@ action basic_strategy(Hand const hand) {
                 total++;
                 loss++;
                 dealer_blackjacks++;
-                player_profit--;
+                
+                player_profit -= 1;
+
                 if(DEBUG) std::cout << "DEALER BLACKJACK" << "\n";
                 continue;
             }
@@ -206,7 +271,9 @@ action basic_strategy(Hand const hand) {
                 total++;
                 win++;
                 player_blackjacks++;
-                player_profit += 1.5;
+        
+                player_profit += 1*BLACKJACK_PAYOUT;
+    
                 if(DEBUG) std::cout << "PLAYER BLACKJACK" << "\n";
                 continue;
             }
@@ -215,7 +282,9 @@ action basic_strategy(Hand const hand) {
             if(hand->is_bust()) {
                 total++;
                 loss++;
-                player_profit--;
+
+                player_profit -= 1;
+
                 if(DEBUG) std::cout << "PLAYER BUST" << "\n";
                 continue;
             }
@@ -224,7 +293,9 @@ action basic_strategy(Hand const hand) {
             if(dealer[0].is_bust()) {
                 total++;
                 win++;
-                player_profit++;
+
+                player_profit += 1;
+
                 if(DEBUG) std::cout << "DEALER BUST" << "\n";
                 continue;
             }
@@ -241,7 +312,9 @@ action basic_strategy(Hand const hand) {
             if(dealer_final_value < value) {
                 total++;
                 win++;
-                player_profit++;
+
+                player_profit += 1;
+
                 if(DEBUG) std::cout << "STANDARD WIN" << "\n";
                 continue;
             }
@@ -250,7 +323,9 @@ action basic_strategy(Hand const hand) {
             if(dealer_final_value > value) {
                 total++;
                 loss++;
-                player_profit--;
+
+                player_profit -= 1;
+
                 if(DEBUG) std::cout << "STANDARD LOSS" << "\n";
                 continue;
             }
