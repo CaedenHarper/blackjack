@@ -14,6 +14,71 @@
 #include <shoe.h>
 #include <player.h>
 
+// PROGRAM SETTINGS
+
+// print debug information throughout the simulation
+constexpr bool DEBUG = false;
+// print stats at the end of the simulation
+constexpr bool PRINT_STATS = true;
+
+
+// BLACKJACK RULE VARIATIONS
+
+// Amount to payout when player gets a blackjack
+// (e.g., if 1.5, 3:2 payout)
+constexpr float BLACKJACK_PAYOUT = 1.5;
+// Number of decks in play
+// (e.g., if 2, Double Deck)
+constexpr int MAX_DECKS = 8;
+// If player can late surrender
+// note: early surrender takes precedence over late surrender
+// (e.g., if early and late are both true, player can early surrender)
+// TODO: implement
+constexpr bool LATE_SURRENDER = false;
+// If player can early surrender
+// note: early surrender takes precedence over late surrender
+// (e.g., if early and late are both true, player can early surrender)
+// TODO: implement
+constexpr bool EARLY_SURRENDER = false;
+// If dealer hits soft seventeen
+// (e.g., if false, dealer stands on A-6)
+constexpr bool HIT_SOFT_SEVENTEEN = true;
+// If player can double after split
+// TODO: implement
+constexpr bool DOUBLE_AFTER_SPLIT = true;
+// If player can split aces
+// TODO: implement
+constexpr bool SPLIT_ACES = true;
+// If player can act on split aces
+// (e.g., if false, player will be given one card and can not act further)
+// TODO: implement
+constexpr bool DRAW_TO_SPLIT_ACES = false;
+// Total number of hands aces can be split to
+// (e.g., if 2, player can split aces to 2 hands total)
+// TODO: implement
+constexpr int SPLIT_ACES_NUM = 2;
+// Total number of hands any non-ace can be split to
+// (e.g., if 4, player can split tens to 4 hands total)
+// TODO: implement
+constexpr int SPLIT_NUM = 4;
+
+
+// SIMULATION SETTINGS
+
+// Total number of hands to play in simulation
+// (e.g., 1000000 = 1,000,000 = 1 million, 1 million hands are played)
+constexpr int MAX_HANDS = 1000000;
+// Percentage of deck to stop dealing at
+constexpr float PENETRATON_PERCENT = 0.25;
+
+
+// MONEY SETTINGS
+
+// Amount of dollars per smallest bet
+constexpr int BETTING_UNIT = 5;
+// Number of hands played per hour
+constexpr int HANDS_PER_HOUR = 250;
+
 // TODO: properly comment
 enum action {
     hit,
@@ -26,6 +91,14 @@ enum action {
 // TODO: properly comment
 action dealer_strategy(Hand const hand) {
     const int value = hand.get_value();
+
+    // S17/H17 distinction
+    // Note: this also affects how players using naive dealer strategy play
+    // This is not necessarily a bug, so I did not make a distinction
+    if(value == 17 && hand.get_soft() && HIT_SOFT_SEVENTEEN) {
+        return hit;
+    }
+
     if(value < 17) {
         return hit;
     }
@@ -34,81 +107,33 @@ action dealer_strategy(Hand const hand) {
 }
 
 // TODO: properly comment
-action basic_strategy(Hand const hand) {
-    const int value = hand.get_value();
-    const bool can_double = hand.get_can_double();
-    const bool can_split = hand.get_can_split();
-    const bool can_surrender = hand.get_can_surrender();
-
+action basic_strategy_one_deck(Hand const player_hand) {
     return hit;
 }
 
+action basic_strategy_two_deck(Hand const player_hand) {
+    return hit;
+}
+
+action basic_strategy_general(Hand const player_hand) {
+    return hit;
+}
+
+action basic_strategy(Hand const player_hand) {
+    switch (MAX_DECKS) {
+    case 1:
+        return basic_strategy_one_deck(player_hand);
+        break;
+    case 2:
+        return basic_strategy_two_deck(player_hand);
+        break;
+    default:
+        return basic_strategy_general(player_hand);
+        break;
+    }
+}
+
  int main() {
-    // PROGRAM SETTINGS
-
-    // print debug information throughout the simulation
-    constexpr bool DEBUG = false;
-    // print stats at the end of the simulation
-    constexpr bool PRINT_STATS = true;
-
-
-    // BLACKJACK RULE VARIATIONS
-
-    // Amount to payout when player gets a blackjack
-    // (e.g., if 1.5, 3:2 payout)
-    constexpr float BLACKJACK_PAYOUT = 1.5;
-    // Number of decks in play
-    // (e.g., if 2, Double Deck)
-    constexpr int MAX_DECKS = 8;
-    // If player can late surrender
-    // note: early surrender takes precedence over late surrender
-    // (e.g., if early and late are both true, player can early surrender)
-    // TODO: implement
-    constexpr bool LATE_SURRENDER = false;
-    // If player can early surrender
-    // note: early surrender takes precedence over late surrender
-    // (e.g., if early and late are both true, player can early surrender)
-    // TODO: implement
-    constexpr bool EARLY_SURRENDER = false;
-    // If dealer hits soft seventeen
-    // (e.g., if false, dealer stands on A-6)
-    // TODO: implement
-    constexpr bool HIT_SOFT_SEVENTEEN = true;
-    // If player can double after split
-    constexpr bool DOUBLE_AFTER_SPLIT = true;
-    // If player can split aces
-    // TODO: implement
-    constexpr bool SPLIT_ACES = true;
-    // If player can act on split aces
-    // (e.g., if false, player will be given one card and can not act further)
-    // TODO: implement
-    constexpr bool DRAW_TO_SPLIT_ACES = false;
-    // Total number of hands aces can be split to
-    // (e.g., if 2, player can split aces to 2 hands total)
-    // TODO: implement
-    constexpr int SPLIT_ACES_NUM = 2;
-    // Total number of hands any non-ace can be split to
-    // (e.g., if 4, player can split tens to 4 hands total)
-    // TODO: implement
-    constexpr int SPLIT_NUM = 4;
-
-
-    // SIMULATION SETTINGS
-
-    // Total number of hands to play in simulation
-    // (e.g., 1000000 = 1,000,000 = 1 million, 1 million hands are played)
-    constexpr int MAX_HANDS = 1000000;
-    // Percentage of deck to stop dealing at
-    constexpr float PENETRATON_PERCENT = 0.25;
-
-
-    // MONEY SETTINGS
-
-    // Amount of dollars per smallest bet
-    constexpr int BETTING_UNIT = 5;
-    // Number of hands played per hour
-    constexpr int HANDS_PER_HOUR = 250;
-
     auto start = std::chrono::steady_clock::now();
 
     // Shoe for simulation
@@ -146,6 +171,7 @@ action basic_strategy(Hand const hand) {
         // Useful dealer constants
         const int dealer_upcard = dealer[0][0];
         const int dealer_init_value = dealer.get_value();
+        Hand* dealer_hand = &dealer.hands[0];
 
         // Has the dealer gotten a blackjack
         bool dealer_blackjack = false;
@@ -192,9 +218,10 @@ action basic_strategy(Hand const hand) {
                 continue;
             }
 
-            action act = dealer_strategy(player[current_index]);
-            // action act = basic_strategy(player[current_index]);
-            switch (act) {
+            action player_action = dealer_strategy(player[current_index]);
+            // action player_action = basic_strategy(player[current_index]);
+            // TODO: consider wrapping in a function
+            switch (player_action) {
             case hit:
                 player.hit(shoe, current_index);
                 break;
@@ -220,14 +247,20 @@ action basic_strategy(Hand const hand) {
         if(DEBUG) std::cout << dealer.get_value() << " -> " << dealer << "\n";
         // dealer hitting loop
         bool all_busted = player.all_busted();
-        while(dealer.get_value() < 17) {
-            // exit loop if all player hands are busted
+        while(true) {
+            // exit loop if all players have busted
             if(all_busted) break;
+
+            action dealer_action = dealer_strategy(*dealer_hand);
+
+            // exit loop if dealer stands
+            if(dealer_action == stand) break;
 
             dealer.hit(shoe);
 
             // exit loop if dealer busts
-            if(dealer[0].is_bust()) break;
+            if(dealer_hand->is_bust()) break;
+
             if(DEBUG) std::cout << dealer.get_value() << " -> " << dealer << "\n";
         }
         if(DEBUG) std::cout << "--DEALER LOOP END--" << "\n\n";
