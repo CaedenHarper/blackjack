@@ -1,4 +1,7 @@
 // TODO in ALL files: add "this" to all classes
+// TODO in ALL files: add pointer prefix to all classes
+// TODO: add pointer prefixes
+// TODO: test everything EXTENSIVELY!!!
 // IO
 #include <iostream>
 #include <iomanip>
@@ -43,16 +46,6 @@ action dealer_strategy(Hand const hand) {
     }
 
     return stand;
-}
-
-// TODO: properly comment
-action basic_strategy_one_deck(Hand const hand, int const dealer_card) {
-    return hit;
-}
-
-// TODO: properly comment
-action basic_strategy_two_deck(Hand const hand, int const dealer_card) {
-    return hit;
 }
 
 // TODO: properly comment
@@ -469,6 +462,35 @@ action basic_strategy_general(Hand const hand, int const dealer_card) {
 }
 
 // TODO: properly comment
+action basic_strategy_one_deck(Hand const hand, int const dealer_card) {
+    return hit;
+}
+
+// TODO: properly comment
+action basic_strategy_two_deck(Hand const hand, int const dealer_card) {
+    int player_value = hand.get_value();
+    bool is_soft = hand.get_soft();
+    bool is_pair = hand.get_pair();
+    bool can_split = hand.get_can_split();
+    bool can_double = hand.get_can_double();
+
+    // hard
+    if(player_value == 9 && dealer_card == 2 && can_double) return double_down;
+    if(player_value == 11 && dealer_card == 11 && can_double) return double_down;
+    if(player_value == 11 && dealer_card == 11) return hit;
+    if(player_value == 16 && dealer_card == 9) return hit;
+
+    // soft
+    if(is_soft && player_value == 13 && dealer_card == 4 && HIT_SOFT_SEVENTEEN && can_double) return double_down;
+
+    // pair
+    if(is_pair && player_value == 12 && dealer_card == 7 && DOUBLE_AFTER_SPLIT && can_split) return split;
+    if(is_pair && player_value == 14 && dealer_card == 8 && DOUBLE_AFTER_SPLIT && can_split) return split;
+
+    return basic_strategy_general(hand, dealer_card);
+}
+
+// TODO: properly comment
 action basic_strategy(Hand const hand, int const dealer_card) {
     switch (MAX_DECKS) {
     case 1:
@@ -541,6 +563,16 @@ action basic_strategy(Hand const hand, int const dealer_card) {
             // player.hands[index]... eventually fix this
             Hand* p_current_hand = &player.hands[current_index];
 
+            // if card was split aces, only allow one more card before de-activating
+            if(p_current_hand->get_split_aces_final_card()) {
+                player.add(shoe, current_index);
+
+                p_current_hand->set_split_aces_final_card(false);
+                p_current_hand->set_active(false);
+
+                continue;
+            }
+
             // populate hand if necessary
             while(p_current_hand->size() < 2) player.add(shoe, current_index);
 
@@ -590,6 +622,10 @@ action basic_strategy(Hand const hand, int const dealer_card) {
                 if(DEBUG) std::cout << "SPLIT! " << player << " -> ";
                 player.split(current_index);
                 if(DEBUG) std::cout << player << "\n";
+                
+                // reset pointer.. shouldn't need to be here, but here in case
+                p_current_hand = &player.hands[current_index];
+
                 total_hands--;
                 break;
             case surrender:
@@ -599,8 +635,8 @@ action basic_strategy(Hand const hand, int const dealer_card) {
                 break;
             default:
                 if(DEBUG) std::cout << "ERROR! " << player << " -> ";
-                break;
                 if(DEBUG) std::cout << player << "\n";
+                break;
             }
         }
         if(DEBUG) std::cout << "--PLAYER LOOP END--" << "\n\n";
@@ -641,13 +677,18 @@ action basic_strategy(Hand const hand, int const dealer_card) {
             // player.hands[index]... eventually fix this
             Hand* p_hand = &player.hands[i];
             int value = p_hand->get_value();
-            // define magnitude of money based on if double
+            bool player_blackjack = p_hand->is_blackjack();
+            bool player_bust = p_hand->is_bust();
+            // define magnitude of money based on double/surrender
             float double_multiplier = p_hand->get_was_doubled() ? 2 : 1;
-            float money_magnitude = 1*double_multiplier;
+            float surrender_multiplier = p_hand->get_was_surrendered() ? 0.5 : 1;
+            float money_magnitude = 1*double_multiplier*surrender_multiplier;
+            // std::cout<<"here14"<<"\n";
+            // std::cout<<*p_hand<<"\n";
 
             // winner logic
             // push
-            if(dealer_blackjack && p_hand->is_blackjack()) {
+            if(dealer_blackjack && player_blackjack) {
                 draw++;
                 dealer_blackjacks++;
                 player_blackjacks++;
@@ -668,7 +709,7 @@ action basic_strategy(Hand const hand, int const dealer_card) {
             }
 
             // win
-            if(p_hand->is_blackjack()) {
+            if(player_blackjack) {
                 win++;
                 player_blackjacks++;
         
@@ -680,7 +721,7 @@ action basic_strategy(Hand const hand, int const dealer_card) {
             }
 
             // loss
-            if(p_hand->is_bust()) {
+            if(player_bust) {
                 loss++;
 
                 player_profit -= money_magnitude;

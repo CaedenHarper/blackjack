@@ -1,8 +1,11 @@
 #ifndef SHOE_H
 #define SHOE_H
 
-#include <vector>
+// OTHER MODULE IMPORTS
 #include <deck.hpp>
+
+// STANDARD LIBRARY
+#include <vector>
 #include <random>
 
 class Shoe : public Deck {

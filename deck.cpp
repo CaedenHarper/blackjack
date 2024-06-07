@@ -1,6 +1,9 @@
+// SELF
+#include <deck.hpp>
+
+// STANDARD LIBRARY
 #include <iostream>
 #include <vector>
-#include <deck.hpp>
 
 Deck :: Deck() {
     cards;

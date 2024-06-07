@@ -1,10 +1,13 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include <iostream>
-#include <vector>
+// OTHER MODULE IMPORTS
 #include <hand.hpp>
 #include <shoe.hpp>
+
+// STANDARD LIBRARY
+#include <iostream>
+#include <vector>
 
 class Player {
     public:

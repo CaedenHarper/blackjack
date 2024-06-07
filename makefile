@@ -13,13 +13,13 @@ main.o: main.cpp settings.hpp
 deck.o: deck.cpp
 	g++ ${ALL_FLAGS} ${COMPILE_FLAGS} deck.cpp
 
-hand.o: hand.cpp
+hand.o: hand.cpp settings.hpp
 	g++ ${ALL_FLAGS} ${COMPILE_FLAGS} hand.cpp
 
 shoe.o: shoe.cpp
 	g++ ${ALL_FLAGS} ${COMPILE_FLAGS} shoe.cpp
 
-player.o: player.cpp
+player.o: player.cpp settings.hpp
 	g++ ${ALL_FLAGS} ${COMPILE_FLAGS} player.cpp
 
 clean:

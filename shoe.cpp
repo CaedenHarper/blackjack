@@ -1,4 +1,7 @@
+// SELF
 #include <shoe.hpp>
+
+// STANDARD LIBRARY
 #include <vector>
 #include <algorithm>
 #include <random>

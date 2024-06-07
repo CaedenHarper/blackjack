@@ -1,8 +1,13 @@
+// SELF
+#include <hand.hpp>
+
+// OTHER MODULES
+#include <settings.hpp>
+
+// STANDARD LIBRARY
 #include <iostream>
 #include <vector>
 #include <numeric>
-#include <hand.hpp>
-// TODO: add pointer prefix to all hand pointers in file
 
 Hand::Hand() : Deck() {
     value = 0;
@@ -12,11 +17,13 @@ Hand::Hand() : Deck() {
     pair = false;
     can_double = true;
     can_split = false;
-    can_surrender = true;
+    can_surrender = LATE_SURRENDER;
     can_blackjack = true;
     active = true;
     was_doubled = false;
+    was_surrendered = false;
     split_num = 1;
+    split_aces_final_card = false;
 }
 
 Hand::Hand(int _card) : Deck(_card) {
@@ -24,11 +31,13 @@ Hand::Hand(int _card) : Deck(_card) {
     pair = false;
     can_double = true;
     can_split = false;
-    can_surrender = true;
+    can_surrender = LATE_SURRENDER;
     can_blackjack = true;
     active = true;
     was_doubled = false;
+    was_surrendered = false;
     split_num = 1;
+    split_aces_final_card = false;
 
     value = _card;
     num_cards = 1;
@@ -61,8 +70,11 @@ std::ostream& operator<<(std::ostream &out, Hand const &hand) {
 }
 
 void Hand::push_back(const int &val) {
+    // std::cout<<"here IN IN 1"<<'\n';
     cards.push_back(val);
+    // std::cout<<"here IN IN 2"<<'\n';
     update(val);
+    // std::cout<<"here IN IN 3"<<'\n';
 }
 
 int Hand::get_value() const {
@@ -101,10 +113,6 @@ bool Hand::get_can_surrender() const {
     return can_surrender;
 }
 
-bool Hand::get_was_doubled() const {
-    return was_doubled;
-}
-
 bool Hand::is_blackjack() const {
     // blackjack if value is 21, made up of only 2 cards,
     // and it is the first hand made (splitting does not count)
@@ -113,6 +121,22 @@ bool Hand::is_blackjack() const {
 
 bool Hand::get_active() const {
     return active;
+}
+
+bool Hand::get_was_doubled() const {
+    return was_doubled;
+}
+
+bool Hand::get_was_surrendered() const {
+    return was_surrendered;
+}
+
+int Hand::get_split_num() const {
+    return split_num;
+}
+
+bool Hand::get_split_aces_final_card() const {
+    return split_aces_final_card;
 }
 
 void Hand::set_has_ace(bool _has_ace) {
@@ -145,6 +169,18 @@ void Hand::set_active(bool _active) {
 
 void Hand::set_was_doubled(bool _was_doubled) {
     was_doubled = _was_doubled;
+}
+
+void Hand::set_was_surrendered(bool _was_surrendered) {
+    was_surrendered = _was_surrendered;
+}
+
+void Hand::increment_split_num() {
+    split_num++;
+}
+
+void Hand::set_split_aces_final_card(bool _split_aces_final_card) {
+    split_aces_final_card = _split_aces_final_card;
 }
 
 void Hand::update(int card) {

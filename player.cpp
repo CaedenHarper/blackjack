@@ -1,8 +1,14 @@
-#include <iostream>
-#include <vector>
+// SELF
 #include <player.hpp>
+
+// OTHER MODULES
 #include <hand.hpp>
 #include <shoe.hpp>
+#include <settings.hpp>
+
+// STANDARD LIBRARY
+#include <iostream>
+#include <vector>
 
 Player::Player() {
     hands = {Hand()};
@@ -48,7 +54,15 @@ int Player::add(Shoe& shoe, int index) {
     hand->push_back(card);
 
     // hand->set_can_double(true);
-    if( (hand->size() == 2) && ((*hand)[0] == (*hand)[1]) ) hand->set_can_split(true);
+
+    if(hand->get_pair()) hand->set_can_split(true);
+    // disallow split depending on split aces rule
+    if((*hand)[0] == 11 && !SPLIT_ACES) hand->set_can_split(false);
+    // disallow split depending on max number of splits
+    if(hand->get_split_num() >= MAX_SPLIT_NUM) hand->set_can_split(false);
+    // disallow split depending on max number of aces splits
+    if((*hand)[0] == 11 && hand->get_split_num() >= MAX_SPLIT_ACES_NUM) hand->set_can_split(false);
+
     // hand->set_can_surrender(true);
     // hand->set_can_blackjack(true);
     // hand->set_active(true);
@@ -64,9 +78,12 @@ int Player::hit(Shoe& shoe, int index) {
     Hand* hand = &hands[index];
     if(hand->get_active() == false) return -1;
 
+    // std::cout<<"here IN 1"<<'\n';
     int card = shoe.pop_back();
+    // std::cout<<"here IN 2"<<'\n';
 
     hand->push_back(card);
+    // std::cout<<"here IN 3"<<'\n';
 
     hand->set_can_double(false);
     hand->set_can_split(false);
@@ -128,23 +145,62 @@ int Player::split(int index) {
     // create new hands and remove old hand
     int pair_card = (*hand)[0];
     hands.erase(hands.begin() + index);
+    
+    // std::cout<<"POST ERASE VECTOR; SIZE = "<<hands.size()<<"\n";
+    // for(int i = 0; i < hands.size(); i++) {
+        // std::cout<<"INDEX: "<<i<<"; hands[" <<i<<"]: "<<hands[i]<<"@ pointer: "<<&hands[i]<<"\n";
+    // }
 
     Hand _hand1 = Hand(pair_card);
-    hands.insert(hands.begin() + index, _hand1);
-    Hand* hand1 = &hands[index];
-    
     Hand _hand2 = Hand(pair_card);
-    hands.insert(hands.begin() + index, _hand2);
-    Hand* hand2 = &hands[index];
 
-    hand1->set_can_double(true);       // depends on double after split rules
-    hand1->set_can_split(true);
+    hands.insert(hands.begin() + index, _hand1);
+    // std::cout<<"POST INSERT HAND 1 VECTOR; SIZE = "<<hands.size()<<"\n";
+    // for(int i = 0; i < hands.size(); i++) {
+        // std::cout<<"INDEX: "<<i<<"; hands[" <<i<<"]: "<<hands[i]<<"@ pointer: "<<&hands[i]<<"\n";
+    // }
+    hands.insert(hands.begin() + index + 1, _hand2);
+    // std::cout<<"POST INSERT HAND 2 VECTOR; SIZE = "<<hands.size()<<"\n";
+    // for(int i = 0; i < hands.size(); i++) {
+        // std::cout<<"INDEX: "<<i<<"; hands[" <<i<<"]: "<<hands[i]<<"@ pointer: "<<&hands[i]<<"\n";
+    // }
+
+    Hand* hand1 = &hands[index];
+    // std::cout<<"HAND 1 POINTER: "<<hand1<<"\n";
+    Hand* hand2 = &hands[index + 1];
+    // std::cout<<"HAND 2 POINTER: "<<hand2<<"\n";
+
+    // if split ace with no drawing, set special flag to only draw one more card
+    if(pair_card == 11 && !DRAW_TO_SPLIT_ACES) {
+        hand1->increment_split_num();
+        hand1->set_can_double(false);
+        hand1->set_can_split(false);
+        hand1->set_can_surrender(false);
+        hand1->set_can_blackjack(false);
+        hand1->set_active(true);
+        hand1->set_split_aces_final_card(true);
+
+        hand2->increment_split_num();
+        hand2->set_can_double(false);
+        hand2->set_can_split(false);
+        hand2->set_can_surrender(false);
+        hand2->set_can_blackjack(false);
+        hand2->set_active(true);
+        hand2->set_split_aces_final_card(true);
+
+        return 0;
+    }
+
+    hand1->increment_split_num();
+    hand1->set_can_double(DOUBLE_AFTER_SPLIT);       // depends on double after split rules
+    hand1->set_can_split(false);
     hand1->set_can_surrender(false);
     hand1->set_can_blackjack(false);
     hand1->set_active(true);
 
-    hand2->set_can_double(true);       // depends on double after split rules
-    hand2->set_can_split(true);
+    hand2->increment_split_num();
+    hand2->set_can_double(DOUBLE_AFTER_SPLIT);       // depends on double after split rules
+    hand2->set_can_split(false);
     hand2->set_can_surrender(false);
     hand2->set_can_blackjack(false);
     hand2->set_active(true);
@@ -167,6 +223,8 @@ int Player::surrender(int index) {
     hand->set_can_blackjack(false);
     hand->set_active(false);
 
+    hand->set_was_surrendered(true);
+
     return 0;
 }
 
@@ -179,6 +237,8 @@ int Player::get_value(int index) {
 }
 
 // Returns list of all active hands indices
+// TODO: consider transforming into get_first_active_index() for speed increase,
+// as only the first active index is ever actually needed in main.cpp
 std::vector<int> Player::get_active_indices() {
     std::vector<int> out;
     for(int i = 0; i < hands.size(); i++) {
