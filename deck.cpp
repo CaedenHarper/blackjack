@@ -6,7 +6,7 @@
 #include <vector>
 
 Deck :: Deck() {
-    cards;
+    cards = std::vector<int>();
 }
 
 Deck :: Deck(int _card) {
