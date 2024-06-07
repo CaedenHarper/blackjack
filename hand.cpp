@@ -1,41 +1,38 @@
 #include <iostream>
 #include <vector>
 #include <numeric>
-#include <hand.h>
+#include <hand.hpp>
 // TODO: add pointer prefix to all hand pointers in file
 
-Hand :: Hand() : Deck() {
+Hand::Hand() : Deck() {
     value = 0;
     num_cards = 0;
-    // has_ace means there is at least one ace
     has_ace = false;
-    // soft means at least one ace is acting as an 11
     soft = false;
-    can_hit = true;
+    pair = false;
     can_double = true;
     can_split = false;
-    can_surrender = false;
+    can_surrender = true;
     can_blackjack = true;
     active = true;
+    was_doubled = false;
+    split_num = 1;
 }
 
-Hand :: Hand(int _card) : Deck(_card) {
-    Hand();
+Hand::Hand(int _card) : Deck(_card) {
+    soft = false;
+    pair = false;
+    can_double = true;
+    can_split = false;
+    can_surrender = true;
+    can_blackjack = true;
+    active = true;
+    was_doubled = false;
+    split_num = 1;
+
+    value = _card;
     num_cards = 1;
     has_ace = (_card == 11) ? 1 : 0;
-}
-
-Hand :: Hand(std::vector<int> _cards) : Deck(_cards) {
-    Hand();
-    int _cards_size = _cards.size();
-    num_cards = _cards_size;
-    has_ace = false;
-    for(int i = 0; i < _cards_size; i++) {
-        if(_cards[i] == 11) {
-            has_ace = true;
-            return;
-        }
-    }
 }
 
 std::ostream& operator<<(std::ostream &out, Hand const &hand) {
@@ -63,8 +60,8 @@ std::ostream& operator<<(std::ostream &out, Hand const &hand) {
     return out;
 }
 
-void Hand :: push_back(const int &val) {
-    cards.push_back(val);;
+void Hand::push_back(const int &val) {
+    cards.push_back(val);
     update(val);
 }
 
@@ -76,41 +73,45 @@ bool Hand::is_bust() const {
     return value > 21;
 }
 
-int Hand :: size() const {
+int Hand::size() const {
     return num_cards;
 }
 
-bool Hand :: get_has_ace() const {
+bool Hand::get_has_ace() const {
     return has_ace;
 }
 
-bool Hand :: get_soft() const {
+bool Hand::get_soft() const {
     return soft;
 }
 
-bool Hand :: get_can_hit() const {
-    return can_hit;
+bool Hand::get_pair() const {
+    return pair;
 }
 
-bool Hand :: get_can_double() const {
+bool Hand::get_can_double() const {
     return can_double;
 }
 
-bool Hand :: get_can_split() const {
+bool Hand::get_can_split() const {
     return can_split;
 }
 
-bool Hand :: get_can_surrender() const {
+bool Hand::get_can_surrender() const {
     return can_surrender;
 }
 
-bool Hand :: is_blackjack() const {
+bool Hand::get_was_doubled() const {
+    return was_doubled;
+}
+
+bool Hand::is_blackjack() const {
     // blackjack if value is 21, made up of only 2 cards,
     // and it is the first hand made (splitting does not count)
     return ((value == 21) && (num_cards == 2) && (can_blackjack));
 }
 
-bool Hand :: get_active() const {
+bool Hand::get_active() const {
     return active;
 }
 
@@ -120,10 +121,6 @@ void Hand::set_has_ace(bool _has_ace) {
 
 void Hand::set_soft(bool _soft) {
     soft = _soft;
-}
-
-void Hand::set_can_hit(bool _can_hit) {
-    can_hit = _can_hit;
 }
 
 void Hand::set_can_double(bool _can_double) {
@@ -146,8 +143,24 @@ void Hand::set_active(bool _active) {
     active = _active;
 }
 
-void Hand :: update(int card) {
+void Hand::set_was_doubled(bool _was_doubled) {
+    was_doubled = _was_doubled;
+}
+
+void Hand::update(int card) {
     num_cards++;
+    
+    // update pair variable
+    if(num_cards == 2) {
+        // two separate if statements to ensure no errors
+        if(card == cards.at(0)) {
+            pair = true;
+        } else {
+            pair = false;
+        }
+    } else {
+        pair = false;
+    }
 
     if(card != 11) {
         // card is not an ace

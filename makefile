@@ -7,7 +7,7 @@ all: prog
 prog: main.o deck.o hand.o shoe.o player.o
 	g++ ${ALL_FLAGS} -o main -g main.o deck.o hand.o shoe.o player.o
 
-main.o: main.cpp
+main.o: main.cpp settings.hpp
 	g++ ${ALL_FLAGS} ${COMPILE_FLAGS} main.cpp
 
 deck.o: deck.cpp

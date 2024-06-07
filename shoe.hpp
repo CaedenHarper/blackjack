@@ -2,7 +2,7 @@
 #define SHOE_H
 
 #include <vector>
-#include <deck.h>
+#include <deck.hpp>
 #include <random>
 
 class Shoe : public Deck {

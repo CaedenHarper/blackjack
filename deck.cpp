@@ -1,6 +1,6 @@
 #include <iostream>
 #include <vector>
-#include <deck.h>
+#include <deck.hpp>
 
 Deck :: Deck() {
     cards;
@@ -8,10 +8,6 @@ Deck :: Deck() {
 
 Deck :: Deck(int _card) {
     cards = {_card};
-}
-
-Deck :: Deck(std::vector<int> _cards) {
-    cards = _cards;
 }
 
 int Deck :: operator [](int i) const {

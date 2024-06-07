@@ -3,8 +3,8 @@
 
 #include <iostream>
 #include <vector>
-#include <hand.h>
-#include <shoe.h>
+#include <hand.hpp>
+#include <shoe.hpp>
 
 class Player {
     public:
@@ -29,7 +29,8 @@ class Player {
     int get_value();
     int get_value(int index);
     std::vector<int> get_active_indices();
-    bool all_busted(); 
+    bool all_busted();
+    bool all_blackjacks();
 };
 
 #endif

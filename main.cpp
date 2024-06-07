@@ -1,3 +1,4 @@
+// TODO in ALL files: add "this" to all classes
 // IO
 #include <iostream>
 #include <iomanip>
@@ -9,75 +10,13 @@
 #include <random>
 
 // Classes
-#include <deck.h>
-#include <hand.h>
-#include <shoe.h>
-#include <player.h>
+#include <deck.hpp>
+#include <hand.hpp>
+#include <shoe.hpp>
+#include <player.hpp>
 
-// PROGRAM SETTINGS
-
-// print debug information throughout the simulation
-constexpr bool DEBUG = false;
-// print stats at the end of the simulation
-constexpr bool PRINT_STATS = true;
-
-
-// BLACKJACK RULE VARIATIONS
-
-// Amount to payout when player gets a blackjack
-// (e.g., if 1.5, 3:2 payout)
-constexpr float BLACKJACK_PAYOUT = 1.5;
-// Number of decks in play
-// (e.g., if 2, Double Deck)
-constexpr int MAX_DECKS = 8;
-// If player can late surrender
-// note: early surrender takes precedence over late surrender
-// (e.g., if early and late are both true, player can early surrender)
-// TODO: implement
-constexpr bool LATE_SURRENDER = false;
-// If player can early surrender
-// note: early surrender takes precedence over late surrender
-// (e.g., if early and late are both true, player can early surrender)
-// TODO: implement
-constexpr bool EARLY_SURRENDER = false;
-// If dealer hits soft seventeen
-// (e.g., if false, dealer stands on A-6)
-constexpr bool HIT_SOFT_SEVENTEEN = true;
-// If player can double after split
-// TODO: implement
-constexpr bool DOUBLE_AFTER_SPLIT = true;
-// If player can split aces
-// TODO: implement
-constexpr bool SPLIT_ACES = true;
-// If player can act on split aces
-// (e.g., if false, player will be given one card and can not act further)
-// TODO: implement
-constexpr bool DRAW_TO_SPLIT_ACES = false;
-// Total number of hands aces can be split to
-// (e.g., if 2, player can split aces to 2 hands total)
-// TODO: implement
-constexpr int SPLIT_ACES_NUM = 2;
-// Total number of hands any non-ace can be split to
-// (e.g., if 4, player can split tens to 4 hands total)
-// TODO: implement
-constexpr int SPLIT_NUM = 4;
-
-
-// SIMULATION SETTINGS
-
-// Total number of hands to play in simulation
-// (e.g., 1000000 = 1,000,000 = 1 million, 1 million hands are played)
-constexpr int MAX_HANDS = 1000000;
-// Percentage of deck to stop dealing at
-constexpr float PENETRATON_PERCENT = 0.25;
-
-
-// MONEY SETTINGS
-
-// Amount of dollars per smallest bet
-constexpr int BETTING_UNIT = 100;
-// Number of hands played per hour
-constexpr int HANDS_PER_HOUR = 100;
+// Program Settings
+#include <settings.hpp>
 
 // TODO: properly comment
 enum action {
@@ -107,29 +46,437 @@ action dealer_strategy(Hand const hand) {
 }
 
 // TODO: properly comment
-action basic_strategy_one_deck(Hand const player_hand) {
+action basic_strategy_one_deck(Hand const hand, int const dealer_card) {
     return hit;
 }
 
-action basic_strategy_two_deck(Hand const player_hand) {
+// TODO: properly comment
+action basic_strategy_two_deck(Hand const hand, int const dealer_card) {
     return hit;
 }
 
-action basic_strategy_general(Hand const player_hand) {
+// TODO: properly comment
+// TODO: currently automatically assumes DAS; fix
+// TODO: refactor
+// TODO: generalize to a file
+action basic_strategy_general(Hand const hand, int const dealer_card) {
+    int player_value = hand.get_value();
+    bool can_split = hand.get_can_split();
+    bool can_double = hand.get_can_double();
+    bool can_surrender = hand.get_can_surrender();
+
+    // Every hand is either soft, a pair, or hard
+    if(hand.get_soft()) {
+        // soft
+        switch (player_value) {
+            case 12:
+                // same as a pair of aces
+                if(can_split) return split;
+                if(dealer_card == 6 && can_double) return double_down;
+                return hit;
+            case 13:
+            case 14:
+                switch (dealer_card) {
+                    case 2:
+                    case 3:
+                    case 4:
+                        return hit;
+                    case 5:
+                    case 6:
+                        if(can_double) return double_down;
+                        return hit;
+                    case 7:
+                    case 8:
+                    case 9:
+                    case 10:
+                    case 11:
+                        return hit;
+                    default:
+                        return hit;
+                }
+            case 15:
+            case 16:
+                switch (dealer_card) {
+                    case 2:
+                    case 3:
+                        return hit;
+                    case 4:
+                    case 5:
+                    case 6:
+                        if(can_double) return double_down;
+                        return hit;
+                    case 7:
+                    case 8:
+                    case 9:
+                    case 10:
+                    case 11:
+                        return hit;
+                    default:
+                        return hit;
+                }
+            case 17:
+                switch (dealer_card) {
+                    case 2:
+                        return hit;
+                    case 3:
+                    case 4:
+                    case 5:
+                    case 6:
+                        if(can_double) return double_down;
+                        return hit;
+                    case 7:
+                    case 8:
+                    case 9:
+                    case 10:
+                    case 11:
+                        return hit;
+                    default:
+                        return hit;
+                }
+            case 18:
+                switch (dealer_card) {
+                    case 2:
+                        if(HIT_SOFT_SEVENTEEN && can_double) return double_down;
+                        return stand;
+                    case 3:
+                    case 4:
+                    case 5:
+                    case 6:
+                        if(can_double) return double_down;
+                        return stand;
+                    case 7:
+                    case 8:
+                        return stand;
+                    case 9:
+                    case 10:
+                    case 11:
+                        return hit;
+                    default:
+                        return hit;
+                }
+            case 19:
+                if(HIT_SOFT_SEVENTEEN && can_double && dealer_card == 6) return double_down;
+                return stand;
+            case 20:
+            case 21:
+                return stand;
+            default:
+                return hit;
+        }
+    } else if(hand.get_pair()) {
+        // pair
+        int pair_card = hand[0];
+        switch (pair_card) {
+        case 2:
+        case 3:
+            switch (dealer_card) {
+            case 2:
+            case 3:
+                if(can_split && DOUBLE_AFTER_SPLIT) return split;
+                return hit;
+            case 4:
+            case 5:
+            case 6:
+            case 7:
+                if(can_split) return split;
+                return hit;
+            case 8:
+            case 9:
+            case 10:
+            case 11:
+                return hit;
+            default:
+                return hit;
+            }
+        case 4:
+            switch (dealer_card) {
+                case 2:
+                case 3:
+                case 4:
+                    return hit;
+                case 5:
+                case 6:
+                    if(can_split && DOUBLE_AFTER_SPLIT) return split;
+                    return hit;
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                    return hit;
+                default:
+                    return hit;
+            }
+        case 5:
+            switch (dealer_card) {
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                    if(can_double) return double_down;
+                    return hit;
+                case 10:
+                case 11:
+                    return hit;
+                default:
+                    return hit;
+            }
+        case 6:
+            switch (dealer_card) {
+                case 2:
+                    if(can_split && DOUBLE_AFTER_SPLIT) return split;
+                    return hit;
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                    if(can_split) return split;
+                    return hit;
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                    return hit;
+                default:
+                    return hit;
+            }
+        case 7:
+            switch (dealer_card) {
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                    if(can_split) return split;
+                    return hit;
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                    return hit;
+                default:
+                    return hit;
+            }
+        case 8:
+            switch (dealer_card) {
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                    if(can_split) return split;
+                    return stand;
+                case 7:
+                case 8:
+                    if(can_split) return split;
+                    return hit;
+                case 9:
+                case 10:
+                    if(can_split) return split;
+                    if(can_surrender && LATE_SURRENDER) return surrender;
+                    return hit;
+                case 11:
+                    if(HIT_SOFT_SEVENTEEN && can_surrender && LATE_SURRENDER) return surrender;
+                    if(can_split) return split;
+                    if(can_surrender && LATE_SURRENDER) return surrender;
+                    return hit;
+                default:
+                    return hit;
+            }
+        case 9:
+            switch (dealer_card) {
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                    if(can_split) return split;
+                    return stand;
+                case 7:
+                    return stand;
+                case 8:
+                case 9:
+                    if(can_split) return split;
+                    return stand;
+                case 10:
+                case 11:
+                    return stand;
+                default:
+                    return stand;
+            }
+        case 10:
+            return stand;
+        case 11:
+            if(can_split) return split;
+            if(dealer_card == 6 && can_double) return double_down;
+            return hit;
+        default:
+            return hit;
+        }
+    } else {
+        // hard
+        switch (player_value) {
+            case 5:
+            case 6:
+            case 7:
+            case 8:
+                return hit;
+            case 9:
+                switch (dealer_card) {
+                    case 2:
+                        return hit;
+                    case 3:
+                    case 4:
+                    case 5:
+                    case 6:
+                        if(can_double) return double_down;
+                        return hit;
+                    case 7:
+                    case 8:
+                    case 9:
+                    case 10:
+                    case 11:
+                        return hit;
+                    default:
+                        return hit;
+                }
+            case 10:
+                switch (dealer_card) {
+                    case 2:
+                    case 3:
+                    case 4:
+                    case 5:
+                    case 6:
+                    case 7:
+                    case 8:
+                    case 9:
+                        if(can_double) return double_down;
+                        return hit;
+                    case 10:
+                        return hit;
+                    case 11:
+                        return hit;
+                    default:
+                        return hit;
+                }
+            case 11:
+                if(!HIT_SOFT_SEVENTEEN && dealer_card == 11) return hit;
+                if(can_double) return double_down;
+                return hit;
+            case 12:
+                switch (dealer_card) {
+                    case 2:
+                    case 3:
+                        return hit;
+                    case 4:
+                    case 5:
+                    case 6:
+                        return stand;
+                    case 7:
+                    case 8:
+                    case 9:
+                    case 10:
+                    case 11:
+                        return hit;
+                    default:
+                        return hit;
+                }
+            case 13:
+            case 14:
+                switch (dealer_card) {
+                    case 2:
+                    case 3:
+                    case 4:
+                    case 5:
+                    case 6:
+                        return stand;
+                    case 7:
+                    case 8:
+                    case 9:
+                    case 10:
+                    case 11:
+                        return hit;
+                    default:
+                        return hit;
+                }
+            case 15:
+                switch (dealer_card) {
+                    case 2:
+                    case 3:
+                    case 4:
+                    case 5:
+                    case 6:
+                        return stand;
+                    case 7:
+                    case 8:
+                    case 9:
+                        return hit;
+                    case 10:
+                        if(can_surrender && LATE_SURRENDER) return surrender;
+                        return hit;
+                    case 11:
+                        if(HIT_SOFT_SEVENTEEN && can_surrender && LATE_SURRENDER) return surrender;
+                        return hit;
+                    default:
+                        return hit;
+                }
+            case 16:
+                switch (dealer_card) {
+                    case 2:
+                    case 3:
+                    case 4:
+                    case 5:
+                    case 6:
+                        if(can_split) return split;
+                        return stand;
+                    case 7:
+                    case 8:
+                        if(can_split) return split;
+                        return hit;
+                    case 9:
+                    case 10:
+                        if(can_split) return split;
+                        if(can_surrender && LATE_SURRENDER) return surrender;
+                        return hit;
+                    case 11:
+                        if(HIT_SOFT_SEVENTEEN && can_surrender && LATE_SURRENDER) return surrender;
+                        if(can_split) return split;
+                        if(can_surrender && LATE_SURRENDER) return surrender;
+                        return hit;
+                    default:
+                        return hit;
+                }
+            case 17:
+                if(HIT_SOFT_SEVENTEEN && can_surrender && LATE_SURRENDER) return surrender;
+                return stand;
+            case 18:
+            case 19:
+            case 20:
+            case 21:
+                return stand;
+            default:
+                return hit;
+        }
+    }
+    // should never get here
     return hit;
 }
 
-action basic_strategy(Hand const player_hand) {
+// TODO: properly comment
+action basic_strategy(Hand const hand, int const dealer_card) {
     switch (MAX_DECKS) {
     case 1:
-        return basic_strategy_one_deck(player_hand);
-        break;
+        return basic_strategy_one_deck(hand, dealer_card);
     case 2:
-        return basic_strategy_two_deck(player_hand);
-        break;
+        return basic_strategy_two_deck(hand, dealer_card);
     default:
-        return basic_strategy_general(player_hand);
-        break;
+        return basic_strategy_general(hand, dealer_card);
     }
 }
 
@@ -144,6 +491,7 @@ action basic_strategy(Hand const player_hand) {
     const int PENETRATION_CARDS = ONE_DECK_SIZE * MAX_DECKS * PENETRATON_PERCENT;
 
     // Statistic variables
+    int total_hands = 0;
     int total = 0;
     int win = 0;
     int loss = 0;
@@ -155,8 +503,9 @@ action basic_strategy(Hand const player_hand) {
     // TODO: replace with bankroll, bet spread, true count, etc.
     float player_profit = 0;
 
+
     // Simulation loop
-    while(total < MAX_HANDS) {
+    while(total_hands < MAX_HANDS) {
         if(shoe.size() <= PENETRATION_CARDS) shoe = Shoe(MAX_DECKS);  
         // Player variables
         Player player = Player();
@@ -218,27 +567,40 @@ action basic_strategy(Hand const player_hand) {
                 continue;
             }
 
-            action player_action = dealer_strategy(player[current_index]);
-            // action player_action = basic_strategy(*p_current_hand);
+            // action player_action = dealer_strategy(*p_current_hand);
+            action player_action = basic_strategy(*p_current_hand, dealer_upcard);
             // TODO: consider wrapping in a function
             switch (player_action) {
             case hit:
+                if(DEBUG) std::cout << "HIT! " << player << " -> ";
                 player.hit(shoe, current_index);
+                if(DEBUG) std::cout << player << "\n";
                 break;
             case stand:
+                if(DEBUG) std::cout << "STAND! " << player << " -> ";
                 player.stand(current_index);
+                if(DEBUG) std::cout << player << "\n";
                 break;
             case double_down:
+                if(DEBUG) std::cout << "DOUBLE! " << player << " -> ";
                 player.double_down(shoe, current_index);
+                if(DEBUG) std::cout << player << "\n";
                 break;
             case split:
+                if(DEBUG) std::cout << "SPLIT! " << player << " -> ";
                 player.split(current_index);
+                if(DEBUG) std::cout << player << "\n";
+                total_hands--;
                 break;
             case surrender:
+                if(DEBUG) std::cout << "SURRENDER! " << player << " -> ";
                 player.surrender(current_index);
+                if(DEBUG) std::cout << player << "\n";
                 break;
             default:
+                if(DEBUG) std::cout << "ERROR! " << player << " -> ";
                 break;
+                if(DEBUG) std::cout << player << "\n";
             }
         }
         if(DEBUG) std::cout << "--PLAYER LOOP END--" << "\n\n";
@@ -247,9 +609,10 @@ action basic_strategy(Hand const player_hand) {
         if(DEBUG) std::cout << dealer.get_value() << " -> " << dealer << "\n";
         // dealer hitting loop
         bool all_busted = player.all_busted();
+        bool all_blackjacks = player.all_blackjacks();
         while(true) {
-            // exit loop if all players have busted
-            if(all_busted) break;
+            // exit loop if all players have busted or all players have blackjacks
+            if(all_busted || all_blackjacks) break;
 
             action dealer_action = dealer_strategy(*p_dealer_hand);
 
@@ -263,23 +626,28 @@ action basic_strategy(Hand const player_hand) {
 
             if(DEBUG) std::cout << dealer.get_value() << " -> " << dealer << "\n";
         }
+        if(DEBUG) std::cout << dealer.get_value() << " -> " << dealer << "\n";
         if(DEBUG) std::cout << "--DEALER LOOP END--" << "\n\n";
-
+        
         if(DEBUG) std::cout << "--WINNING LOOP--" << "\n";
         int dealer_final_value = dealer.get_value();
         // player winning/losing loop
         for(int i = 0; i < player.hands.size(); i++) {
+            total_hands++;
+            total++;
             // TODO:
             // For some reason player.hands[index] is required because
             // player[index] throws an error even though player[index] simply returns
             // player.hands[index]... eventually fix this
             Hand* p_hand = &player.hands[i];
             int value = p_hand->get_value();
+            // define magnitude of money based on if double
+            float double_multiplier = p_hand->get_was_doubled() ? 2 : 1;
+            float money_magnitude = 1*double_multiplier;
 
             // winner logic
             // push
             if(dealer_blackjack && p_hand->is_blackjack()) {
-                total++;
                 draw++;
                 dealer_blackjacks++;
                 player_blackjacks++;
@@ -289,53 +657,52 @@ action basic_strategy(Hand const player_hand) {
             
             // loss
             if(dealer_blackjack) {
-                total++;
                 loss++;
                 dealer_blackjacks++;
                 
-                player_profit -= 1;
+                player_profit -= money_magnitude;
 
                 if(DEBUG) std::cout << "DEALER BLACKJACK" << "\n";
+                if(DEBUG) std::cout << "-" << money_magnitude << "\n";
                 continue;
             }
 
             // win
             if(p_hand->is_blackjack()) {
-                total++;
                 win++;
                 player_blackjacks++;
         
-                player_profit += 1*BLACKJACK_PAYOUT;
+                player_profit += money_magnitude*BLACKJACK_PAYOUT;
     
                 if(DEBUG) std::cout << "PLAYER BLACKJACK" << "\n";
+                if(DEBUG) std::cout << money_magnitude*BLACKJACK_PAYOUT << "\n";
                 continue;
             }
 
             // loss
             if(p_hand->is_bust()) {
-                total++;
                 loss++;
 
-                player_profit -= 1;
+                player_profit -= money_magnitude;
 
                 if(DEBUG) std::cout << "PLAYER BUST" << "\n";
+                if(DEBUG) std::cout << "-" << money_magnitude << "\n";
                 continue;
             }
 
             // win
             if(dealer[0].is_bust()) {
-                total++;
                 win++;
 
-                player_profit += 1;
+                player_profit += money_magnitude;
 
                 if(DEBUG) std::cout << "DEALER BUST" << "\n";
+                if(DEBUG) std::cout << money_magnitude << "\n";
                 continue;
             }
 
             // push
             if(dealer_final_value == value) {
-                total++;
                 draw++;
                 if(DEBUG) std::cout << "STANDARD PUSH" << "\n";
                 continue;
@@ -343,28 +710,27 @@ action basic_strategy(Hand const player_hand) {
             
             // win
             if(dealer_final_value < value) {
-                total++;
                 win++;
 
-                player_profit += 1;
+                player_profit += money_magnitude;
 
                 if(DEBUG) std::cout << "STANDARD WIN" << "\n";
+                if(DEBUG) std::cout << money_magnitude << "\n";
                 continue;
             }
 
             // loss
             if(dealer_final_value > value) {
-                total++;
                 loss++;
 
-                player_profit -= 1;
+                player_profit -= money_magnitude;
 
                 if(DEBUG) std::cout << "STANDARD LOSS" << "\n";
+                if(DEBUG) std::cout << "-" << money_magnitude << "\n";
                 continue;
             }
 
         // should never get here
-        total++;
         }
         if(DEBUG) std::cout << "--WINNING LOOP END--" << "\n\n";
     }
