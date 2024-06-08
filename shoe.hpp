@@ -20,6 +20,7 @@ class Shoe : public Deck {
     const static std::vector<int> eight_decks;
     
     Shoe(int n_decks);
+    Shoe(int n_decks, bool shuffled);
     void shuffle();
 };
 

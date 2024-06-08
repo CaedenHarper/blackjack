@@ -15,8 +15,7 @@ const std::vector<int> Shoe::six_decks = {11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10
 const std::vector<int> Shoe::eight_decks = {11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10};
 std::default_random_engine Shoe::rng = std::default_random_engine {std::random_device{}()};
 
-Shoe :: Shoe(int _num_decks) {
-    Deck();
+Shoe::Shoe(int _num_decks) : Deck() {
     num_decks = _num_decks;
 
     switch (num_decks) {
@@ -45,6 +44,35 @@ Shoe :: Shoe(int _num_decks) {
     shuffle();
 }
 
-void Shoe :: shuffle() {
+Shoe::Shoe(int _num_decks, bool shuffled) : Deck() {
+    num_decks = _num_decks;
+
+    switch (num_decks) {
+    case 1:
+        cards = one_deck;
+        break;
+    case 2:
+        cards = two_decks;
+        break;
+    case 4:
+        cards = four_decks;
+        break;
+    case 6:
+        cards = six_decks;
+        break;
+    case 8:
+        cards = eight_decks;
+        break;
+    default:
+        for(int i = 0; i < num_decks; i++) {
+            cards.insert(cards.end(), one_deck.begin(), one_deck.end());
+        }
+        break;
+    }
+
+    if(shuffled) shuffle();
+}
+
+void Shoe::shuffle() {
     std::shuffle(std::begin(cards), std::end(cards), rng);
 }

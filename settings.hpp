@@ -8,7 +8,7 @@
 constexpr inline float BLACKJACK_PAYOUT = 1.5;
 // Number of decks in play
 // (e.g., if 2, Double Deck)
-constexpr inline int MAX_DECKS = 8;
+constexpr inline int MAX_DECKS = 1;
 // If player can late surrender
 // note: early surrender takes precedence over late surrender
 // (e.g., if early and late are both true, player can early surrender)
@@ -53,7 +53,7 @@ constexpr inline float PENETRATON_PERCENT = 0.25;
 // MONEY SETTINGS
 
 // Amount of dollars per smallest bet
-constexpr inline float BETTING_UNIT = 100;
+constexpr inline float BETTING_UNIT = 1;
 // Number of hands played per hour
 constexpr inline int HANDS_PER_HOUR = 100;
 

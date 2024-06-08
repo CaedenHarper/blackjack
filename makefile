@@ -1,11 +1,16 @@
 COMPILE_FLAGS = -c
 ALL_FLAGS = -O2 -I.
 
-
 all: prog
 
 prog: main.o deck.o hand.o shoe.o player.o strategy.o
 	g++ ${ALL_FLAGS} -o main -g main.o deck.o hand.o shoe.o player.o strategy.o
+
+test: test.o deck.o hand.o shoe.o player.o strategy.o settings.hpp
+	g++ ${ALL_FLAGS} -o test -g test.o deck.o hand.o shoe.o player.o strategy.o
+
+test.o: test.cpp settings.hpp
+	g++ ${ALL_FLAGS} ${COMPILE_FLAGS} test.cpp
 
 main.o: main.cpp settings.hpp
 	g++ ${ALL_FLAGS} ${COMPILE_FLAGS} main.cpp
