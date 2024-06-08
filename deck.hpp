@@ -11,7 +11,6 @@ class Deck {
     
     Deck();
     Deck(int card);
-    Deck(std::vector<int> cards);
     int operator [](int i) const;
     friend std::ostream& operator<<(std::ostream &out, const Deck &deck);
     int size() const;

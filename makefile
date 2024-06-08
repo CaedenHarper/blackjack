@@ -4,8 +4,8 @@ ALL_FLAGS = -O2 -I.
 
 all: prog
 
-prog: main.o deck.o hand.o shoe.o player.o
-	g++ ${ALL_FLAGS} -o main -g main.o deck.o hand.o shoe.o player.o
+prog: main.o deck.o hand.o shoe.o player.o strategy.o
+	g++ ${ALL_FLAGS} -o main -g main.o deck.o hand.o shoe.o player.o strategy.o
 
 main.o: main.cpp settings.hpp
 	g++ ${ALL_FLAGS} ${COMPILE_FLAGS} main.cpp
@@ -21,6 +21,9 @@ shoe.o: shoe.cpp
 
 player.o: player.cpp settings.hpp
 	g++ ${ALL_FLAGS} ${COMPILE_FLAGS} player.cpp
+
+strategy.o: strategy.cpp settings.hpp
+	g++ ${ALL_FLAGS} ${COMPILE_FLAGS} strategy.cpp
 
 clean:
 	rm -rf *.o

@@ -12,7 +12,7 @@ constexpr inline int MAX_DECKS = 8;
 // If player can late surrender
 // note: early surrender takes precedence over late surrender
 // (e.g., if early and late are both true, player can early surrender)
-constexpr inline bool LATE_SURRENDER = true;
+constexpr inline bool LATE_SURRENDER = false;
 // If player can early surrender
 // note: early surrender takes precedence over late surrender
 // (e.g., if early and late are both true, player can early surrender)
@@ -21,17 +21,17 @@ constexpr inline bool LATE_SURRENDER = true;
 
 // If dealer hits soft seventeen
 // (e.g., if false, dealer stands on A-6)
-constexpr inline bool HIT_SOFT_SEVENTEEN = false;
+constexpr inline bool HIT_SOFT_SEVENTEEN = true;
 // If player can double after split
 constexpr inline bool DOUBLE_AFTER_SPLIT = true;
 // If player can split aces
 constexpr inline bool SPLIT_ACES = true;
 // If player can act on split aces
 // (e.g., if false, player will be given one card and can not act further)
-constexpr inline bool DRAW_TO_SPLIT_ACES = true;
+constexpr inline bool DRAW_TO_SPLIT_ACES = false;
 // Total number of hands aces can be split to
 // (e.g., if 2, player can split aces to 2 hands total)
-constexpr inline int MAX_SPLIT_ACES_NUM = 4;
+constexpr inline int MAX_SPLIT_ACES_NUM = 2;
 // Total number of hands any non-ace can be split to
 // (e.g., if 4, player can split tens to 4 hands total)
 constexpr inline int MAX_SPLIT_NUM = 4;
