@@ -13,7 +13,7 @@ Deck::Deck(int card) {
     this->cards = {card};
 }
 
-int Deck::operator [](int i) const {
+int Deck::at(int i) const {
     return this->cards.at(i);
 }
 
@@ -25,17 +25,17 @@ std::ostream& operator<<(std::ostream &out, const Deck &deck) {
 
     // TODO: consider refactoring
     // write A instead of 11
-    if(deck[0] == 11) {
+    if(deck.at(0) == 11) {
         out << "[" << "A";
     } else {
-        out << "[" << deck[0];
+        out << "[" << deck.at(0);
     }
     for(int i = 1; i < deck.size(); i++) {
         // write A instead of 11
-        if(deck[i] == 11) {
+        if(deck.at(i) == 11) {
             out << ", " << "A";
         } else {
-            out << ", " << deck[i];
+            out << ", " << deck.at(i);
         }
     }
     out << "]";

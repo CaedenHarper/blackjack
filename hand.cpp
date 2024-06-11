@@ -52,16 +52,16 @@ std::ostream& operator<<(std::ostream &out, Hand const &hand) {
 
     // TODO: consider changing writing A instead of 11 method
     // write A instead of 11
-    if(hand[0] == 11) {
+    if(hand.at(0) == 11) {
         out << "[" << "A";
     } else {
-        out << "[" << hand[0];
+        out << "[" << hand.at(0);
     }
     for(int i = 1; i < hand.size(); i++) {
-        if(hand[i] == 11) {
+        if(hand.at(i) == 11) {
             out << ", " << "A";
         } else {
-            out << ", " << hand[i];
+            out << ", " << hand.at(i);
         }
     }
     out << "]";

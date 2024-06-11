@@ -11,7 +11,7 @@ class Deck {
     
     Deck();
     Deck(int card);
-    int operator [](int i) const;
+    int at(int i) const;
     friend std::ostream& operator<<(std::ostream &out, const Deck &deck);
     int size() const;
     void clear();

@@ -14,7 +14,7 @@ Player::Player() {
     this->hands = {Hand()};
 }
 
-Hand Player::operator [](int i) const {
+Hand Player::at(int i) const {
     return this->hands.at(i);
 }
 
@@ -24,9 +24,9 @@ std::ostream& operator<<(std::ostream &out, const Player &player) {
         return out;
     }
 
-    out << "{" << player[0];
+    out << "{" << player.at(0);
     for(int i = 1; i < player.size(); i++) {
-        out << ", " << player[i];
+        out << ", " << player.at(i);
     }
     out << "}";
 
@@ -54,11 +54,11 @@ int Player::add(Shoe& shoe, int index) {
 
     if(p_hand->get_pair()) p_hand->set_can_split(true);
     // disallow split depending on split aces rule
-    if((*p_hand)[0] == 11 && !SPLIT_ACES) p_hand->set_can_split(false);
+    if(p_hand->at(0) == 11 && !SPLIT_ACES) p_hand->set_can_split(false);
     // disallow split depending on max number of splits
     if(p_hand->get_split_num() >= MAX_SPLIT_NUM) p_hand->set_can_split(false);
     // disallow split depending on max number of aces splits
-    if((*p_hand)[0] == 11 && p_hand->get_split_num() >= MAX_SPLIT_ACES_NUM) p_hand->set_can_split(false);
+    if(p_hand->at(0) == 11 && p_hand->get_split_num() >= MAX_SPLIT_ACES_NUM) p_hand->set_can_split(false);
 
     // p_hand->set_can_surrender(true);
     // p_hand->set_can_blackjack(true);
@@ -137,7 +137,7 @@ int Player::split(int index) {
     if(p_hand->get_can_split() == false) return -1;
 
     // create new hands and remove old hand
-    int pair_card = (*p_hand)[0];
+    int pair_card = p_hand->at(0);
     this->hands.erase(this->hands.begin() + index);
 
     Hand hand1 = Hand(pair_card);

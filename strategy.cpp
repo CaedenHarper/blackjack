@@ -132,7 +132,7 @@ action basic_strategy_general(Hand const hand, int const dealer_card) {
         }
     } else if(hand.get_pair()) {
         // pair
-        int pair_card = hand[0];
+        int pair_card = hand.at(0);
         switch (pair_card) {
         case 2:
         case 3:

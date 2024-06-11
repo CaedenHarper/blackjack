@@ -14,7 +14,7 @@ class Player {
     std::vector<Hand> hands;
 
     Player();
-    Hand operator [](int i) const;
+    Hand at(int i) const;
     friend std::ostream& operator<<(std::ostream &out, const Player &player);
     int size() const;
     int add(Shoe& shoe);

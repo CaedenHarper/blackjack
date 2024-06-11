@@ -35,9 +35,9 @@ void test() {
 
     std::cout<<"TEST SHOE PRINTOUT"<<"\n";
     for(int i = shoe.size()-1; i >= 0; i--) {
-        int value = shoe[i];
+        int value = shoe.at(i);
         std::cout<<value<<"\n";
-        card_frequency[value]++;
+        card_frequency.at(value)++;
         wait_for_input();
     }
     std::cout<<"SHOE SIZE: "<<shoe.size()<<"\n";
@@ -86,9 +86,9 @@ void test() {
         dealer.add(shoe);
         
         // Useful dealer constants
-        const int dealer_upcard = dealer[0][0];
+        const int dealer_upcard = dealer.at(0).at(0);
         const int dealer_init_value = dealer.get_value();
-        Hand* p_dealer_hand = &dealer.hands[0];
+        Hand* p_dealer_hand = &dealer.hands.at(0);
 
         // Has the dealer gotten a blackjack
         bool dealer_blackjack = false;
@@ -96,18 +96,14 @@ void test() {
         std::cout << "HAND " << index << ":" << "\n";
         // main round loop
         while(true) {
-            // exit loop if no active hands
-            std::vector<int> active_indices = player.get_active_indices();
-
-            if(active_indices.size() == 0) break;
-
             // init current values
-            int current_index = active_indices.at(0);
-            // TODO:
-            // For some reason player.hands[index] is required because
-            // player[index] throws an error even though player[index] simply returns
-            // player.hands[index]... eventually fix this
-            Hand* p_current_hand = &player.hands[current_index];
+            int current_index = player.get_first_active_index();
+
+            // exit loop if no active hands
+            if(current_index == -1) break;
+
+            // TODO: replace with player.at()
+            Hand* p_current_hand = &player.hands.at(current_index);
 
             // if card was split aces, only allow one more card before de-activating
             if(p_current_hand->get_split_aces_final_card()) {
@@ -194,7 +190,7 @@ void test() {
                 player.split(current_index);
                 
                 // reset pointer.. shouldn't need to be here, but here in case
-                p_current_hand = &player.hands[current_index];
+                p_current_hand = &player.hands.at(current_index);
 
                 break;
             case action::surrender:
@@ -240,11 +236,8 @@ void test() {
         // player winning/losing loop
         for(int i = 0; i < player.hands.size(); i++) {
             index++;
-            // TODO:
-            // For some reason player.hands[index] is required because
-            // player[index] throws an error even though player[index] simply returns
-            // player.hands[index]... eventually fix this
-            Hand* p_hand = &player.hands[i];
+            // TODO: replace with player.at()
+            Hand* p_hand = &player.hands.at(i);
             int value = p_hand->get_value();
             bool player_blackjack = p_hand->is_blackjack();
             bool player_bust = p_hand->is_bust();
@@ -297,7 +290,7 @@ void test() {
             }
 
             // win
-            if(dealer[0].is_bust()) {
+            if(dealer.at(0).is_bust()) {
                 player_profit += money_magnitude;
 
                 std::cout << "Player Wins\n\n";
