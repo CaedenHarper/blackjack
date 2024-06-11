@@ -11,14 +11,11 @@
 #include <vector>
 
 Player::Player() {
-    hands = {Hand()};
+    this->hands = {Hand()};
 }
 
 Hand Player::operator [](int i) const {
-    if(hands.size() < 1) {
-        std::cout << "EMPTY PLAYER ERROR" << "\n";
-    }
-    return hands[i];
+    return this->hands.at(i);
 }
 
 std::ostream& operator<<(std::ostream &out, const Player &player) {
@@ -37,203 +34,185 @@ std::ostream& operator<<(std::ostream &out, const Player &player) {
 }
 
 int Player::size() const {
-    return hands.size();
+    return this->hands.size();
 }
 
 int Player::add(Shoe& shoe) {
-    return add(shoe, 0);
+    return this->add(shoe, 0);
 }
 
 // Add card to hand without modifying attributes
 int Player::add(Shoe& shoe, int index) {
-    Hand* hand = &hands[index];
-    if(hand->get_active() == false) return -1;
+    Hand* p_hand = &hands.at(index);
+    if(p_hand->get_active() == false) return -1;
 
     int card = shoe.pop_back();
 
-    hand->push_back(card);
+    p_hand->push_back(card);
 
-    // hand->set_can_double(true);
+    // p_hand->set_can_double(true);
 
-    if(hand->get_pair()) hand->set_can_split(true);
+    if(p_hand->get_pair()) p_hand->set_can_split(true);
     // disallow split depending on split aces rule
-    if((*hand)[0] == 11 && !SPLIT_ACES) hand->set_can_split(false);
+    if((*p_hand)[0] == 11 && !SPLIT_ACES) p_hand->set_can_split(false);
     // disallow split depending on max number of splits
-    if(hand->get_split_num() >= MAX_SPLIT_NUM) hand->set_can_split(false);
+    if(p_hand->get_split_num() >= MAX_SPLIT_NUM) p_hand->set_can_split(false);
     // disallow split depending on max number of aces splits
-    if((*hand)[0] == 11 && hand->get_split_num() >= MAX_SPLIT_ACES_NUM) hand->set_can_split(false);
+    if((*p_hand)[0] == 11 && p_hand->get_split_num() >= MAX_SPLIT_ACES_NUM) p_hand->set_can_split(false);
 
-    // hand->set_can_surrender(true);
-    // hand->set_can_blackjack(true);
-    // hand->set_active(true);
+    // p_hand->set_can_surrender(true);
+    // p_hand->set_can_blackjack(true);
+    // p_hand->set_active(true);
 
     return 0;
 }
 
 int Player::hit(Shoe& shoe) {
-    return hit(shoe, 0);
+    return this->hit(shoe, 0);
 }
 
 int Player::hit(Shoe& shoe, int index) {
-    Hand* hand = &hands[index];
-    if(hand->get_active() == false) return -1;
+    Hand* p_hand = &hands.at(index);
+    if(p_hand->get_active() == false) return -1;
 
-    // std::cout<<"here IN 1"<<'\n';
     int card = shoe.pop_back();
-    // std::cout<<"here IN 2"<<'\n';
 
-    hand->push_back(card);
-    // std::cout<<"here IN 3"<<'\n';
+    p_hand->push_back(card);
 
-    hand->set_can_double(false);
-    hand->set_can_split(false);
-    hand->set_can_surrender(false);
-    hand->set_can_blackjack(false);
-    // hand->set_active(true);
+    p_hand->set_can_double(false);
+    p_hand->set_can_split(false);
+    p_hand->set_can_surrender(false);
+    p_hand->set_can_blackjack(false);
+    // p_hand->set_active(true);
 
     return 0;
 }
 
 int Player::stand() {
-    return stand(0);
+    return this->stand(0);
 }
 
 int Player::stand(int index) {
-    Hand* hand = &hands[index];
-    if(hand->get_active() == false) return -1;
+    Hand* p_hand = &hands.at(index);
+    if(p_hand->get_active() == false) return -1;
 
-    hand->set_can_double(false);
-    hand->set_can_split(false);
-    hand->set_can_surrender(false);
-    // hand->set_can_blackjack(true);
-    hand->set_active(false);
+    p_hand->set_can_double(false);
+    p_hand->set_can_split(false);
+    p_hand->set_can_surrender(false);
+    // p_hand->set_can_blackjack(true);
+    p_hand->set_active(false);
 
     return 0;
 }
 
 int Player::double_down(Shoe& shoe) {
-    return double_down(shoe, 0);
+    return this->double_down(shoe, 0);
 }
 
 int Player::double_down(Shoe& shoe, int index) {
     int card = shoe.pop_back();
 
-    Hand* hand = &hands[index];
-    if(hand->get_can_double() == false) return -1;
+    Hand* p_hand = &hands.at(index);
+    if(p_hand->get_can_double() == false) return -1;
 
-    hand->push_back(card);
+    p_hand->push_back(card);
 
-    hand->set_can_double(false);
-    hand->set_can_split(false);
-    hand->set_can_surrender(false);
-    hand->set_can_blackjack(false);
-    hand->set_active(false);
+    p_hand->set_can_double(false);
+    p_hand->set_can_split(false);
+    p_hand->set_can_surrender(false);
+    p_hand->set_can_blackjack(false);
+    p_hand->set_active(false);
 
-    hand->set_was_doubled(true);
+    p_hand->set_was_doubled(true);
 
     return 0;
 }
 
 int Player::split() {
-    return split(0);
+    return this->split(0);
 }
 
 int Player::split(int index) {
-    Hand* hand = &hands[index];
-    if(hand->get_can_split() == false) return -1;
+    Hand* p_hand = &hands.at(index);
+    if(p_hand->get_can_split() == false) return -1;
 
     // create new hands and remove old hand
-    int pair_card = (*hand)[0];
-    hands.erase(hands.begin() + index);
-    
-    // std::cout<<"POST ERASE VECTOR; SIZE = "<<hands.size()<<"\n";
-    // for(int i = 0; i < hands.size(); i++) {
-        // std::cout<<"INDEX: "<<i<<"; hands[" <<i<<"]: "<<hands[i]<<"@ pointer: "<<&hands[i]<<"\n";
-    // }
+    int pair_card = (*p_hand)[0];
+    this->hands.erase(this->hands.begin() + index);
 
-    Hand _hand1 = Hand(pair_card);
-    Hand _hand2 = Hand(pair_card);
+    Hand hand1 = Hand(pair_card);
+    Hand hand2 = Hand(pair_card);
 
-    hands.insert(hands.begin() + index, _hand1);
-    // std::cout<<"POST INSERT HAND 1 VECTOR; SIZE = "<<hands.size()<<"\n";
-    // for(int i = 0; i < hands.size(); i++) {
-        // std::cout<<"INDEX: "<<i<<"; hands[" <<i<<"]: "<<hands[i]<<"@ pointer: "<<&hands[i]<<"\n";
-    // }
-    hands.insert(hands.begin() + index + 1, _hand2);
-    // std::cout<<"POST INSERT HAND 2 VECTOR; SIZE = "<<hands.size()<<"\n";
-    // for(int i = 0; i < hands.size(); i++) {
-        // std::cout<<"INDEX: "<<i<<"; hands[" <<i<<"]: "<<hands[i]<<"@ pointer: "<<&hands[i]<<"\n";
-    // }
+    hands.insert(hands.begin() + index, hand1);
+    hands.insert(hands.begin() + index + 1, hand2);
 
-    Hand* hand1 = &hands[index];
-    // std::cout<<"HAND 1 POINTER: "<<hand1<<"\n";
-    Hand* hand2 = &hands[index + 1];
-    // std::cout<<"HAND 2 POINTER: "<<hand2<<"\n";
+    Hand* p_hand1 = &hands.at(index);
+    Hand* p_hand2 = &hands.at(index + 1);
 
     // if split ace with no drawing, set special flag to only draw one more card
     if(pair_card == 11 && !DRAW_TO_SPLIT_ACES) {
-        hand1->increment_split_num();
-        hand1->set_can_double(false);
-        hand1->set_can_split(false);
-        hand1->set_can_surrender(false);
-        hand1->set_can_blackjack(false);
-        hand1->set_active(true);
-        hand1->set_split_aces_final_card(true);
+        p_hand1->increment_split_num();
+        p_hand1->set_can_double(false);
+        p_hand1->set_can_split(false);
+        p_hand1->set_can_surrender(false);
+        p_hand1->set_can_blackjack(false);
+        p_hand1->set_active(true);
+        p_hand1->set_split_aces_final_card(true);
 
-        hand2->increment_split_num();
-        hand2->set_can_double(false);
-        hand2->set_can_split(false);
-        hand2->set_can_surrender(false);
-        hand2->set_can_blackjack(false);
-        hand2->set_active(true);
-        hand2->set_split_aces_final_card(true);
+        p_hand2->increment_split_num();
+        p_hand2->set_can_double(false);
+        p_hand2->set_can_split(false);
+        p_hand2->set_can_surrender(false);
+        p_hand2->set_can_blackjack(false);
+        p_hand2->set_active(true);
+        p_hand2->set_split_aces_final_card(true);
 
         return 0;
     }
 
-    hand1->increment_split_num();
-    hand1->set_can_double(DOUBLE_AFTER_SPLIT);       // depends on double after split rules
-    hand1->set_can_split(false);
-    hand1->set_can_surrender(false);
-    hand1->set_can_blackjack(false);
-    hand1->set_active(true);
+    p_hand1->increment_split_num();
+    p_hand1->set_can_double(DOUBLE_AFTER_SPLIT);       // depends on double after split rules
+    p_hand1->set_can_split(false);
+    p_hand1->set_can_surrender(false);
+    p_hand1->set_can_blackjack(false);
+    p_hand1->set_active(true);
 
-    hand2->increment_split_num();
-    hand2->set_can_double(DOUBLE_AFTER_SPLIT);       // depends on double after split rules
-    hand2->set_can_split(false);
-    hand2->set_can_surrender(false);
-    hand2->set_can_blackjack(false);
-    hand2->set_active(true);
+    p_hand2->increment_split_num();
+    p_hand2->set_can_double(DOUBLE_AFTER_SPLIT);       // depends on double after split rules
+    p_hand2->set_can_split(false);
+    p_hand2->set_can_surrender(false);
+    p_hand2->set_can_blackjack(false);
+    p_hand2->set_active(true);
 
     return 0;
 }
 
 int Player::surrender() {
-    return surrender(0);
+    return this->surrender(0);
 }
 
 int Player::surrender(int index) {
-    Hand* hand = &hands[index];
-    if(hand->get_can_surrender() == false) return -1;
+    Hand* p_hand = &hands.at(index);
+    if(p_hand->get_can_surrender() == false) return -1;
 
-    hand->set_can_split(false);
-    hand->set_can_double(false);
-    hand->set_can_split(false);
-    hand->set_can_surrender(false);
-    hand->set_can_blackjack(false);
-    hand->set_active(false);
+    p_hand->set_can_split(false);
+    p_hand->set_can_double(false);
+    p_hand->set_can_split(false);
+    p_hand->set_can_surrender(false);
+    p_hand->set_can_blackjack(false);
+    p_hand->set_active(false);
 
-    hand->set_was_surrendered(true);
+    p_hand->set_was_surrendered(true);
 
     return 0;
 }
 
 int Player::get_value() {
-    return get_value(0);
+    return this->get_value(0);
 }
 
 int Player::get_value(int index) {
-    return hands[index].get_value();
+    return this->hands.at(index).get_value();
 }
 
 // Returns list of all active hands indices
@@ -241,8 +220,8 @@ int Player::get_value(int index) {
 // as only the first active index is ever actually needed in main.cpp
 std::vector<int> Player::get_active_indices() {
     std::vector<int> out;
-    for(int i = 0; i < hands.size(); i++) {
-        Hand hand = hands[i];
+    for(int i = 0; i < this->hands.size(); i++) {
+        Hand hand = this->hands.at(i);
         if(hand.get_active()) out.push_back(i);
     }
     return out;
@@ -250,8 +229,8 @@ std::vector<int> Player::get_active_indices() {
 
 // Returns true if all hands have busted
 bool Player::all_busted() {
-    for(int i = 0; i < hands.size(); i++) {
-        Hand hand = hands[i];
+    for(int i = 0; i < this->hands.size(); i++) {
+        Hand hand = this->hands.at(i);
         if(!hand.is_bust()) return false;
     }
 
@@ -260,8 +239,8 @@ bool Player::all_busted() {
 
 // Returns true if all hands are blackjacks
 bool Player::all_blackjacks() {
-    for(int i = 0; i < hands.size(); i++) {
-        Hand hand = hands[i];
+    for(int i = 0; i < this->hands.size(); i++) {
+        Hand hand = this->hands.at(i);
         if(!hand.is_blackjack()) return false;
     }
 

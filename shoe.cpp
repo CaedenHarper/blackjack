@@ -15,28 +15,28 @@ const std::vector<int> Shoe::six_decks = {11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10
 const std::vector<int> Shoe::eight_decks = {11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 10, 10, 10, 10, 9, 8, 7, 6, 5, 4, 3, 2, 11, 10, 10, 10, 10, 9, 8, 7, 6, 5, 4, 3, 2, 11, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 10, 10, 10, 10, 9, 8, 7, 6, 5, 4, 3, 2, 11, 10, 10, 10, 10, 9, 8, 7, 6, 5, 4, 3, 2, 11, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 10, 10, 10, 10, 9, 8, 7, 6, 5, 4, 3, 2, 11, 10, 10, 10, 10, 9, 8, 7, 6, 5, 4, 3, 2, 11, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 10, 10, 10, 10, 9, 8, 7, 6, 5, 4, 3, 2, 11, 10, 10, 10, 10, 9, 8, 7, 6, 5, 4, 3, 2, 11, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 10, 10, 10, 10, 9, 8, 7, 6, 5, 4, 3, 2, 11, 10, 10, 10, 10, 9, 8, 7, 6, 5, 4, 3, 2, 11, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 10, 10, 10, 10, 9, 8, 7, 6, 5, 4, 3, 2, 11, 10, 10, 10, 10, 9, 8, 7, 6, 5, 4, 3, 2, 11, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 10, 10, 10, 10, 9, 8, 7, 6, 5, 4, 3, 2, 11, 10, 10, 10, 10, 9, 8, 7, 6, 5, 4, 3, 2, 11, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 10, 10, 10, 10, 9, 8, 7, 6, 5, 4, 3, 2, 11, 10, 10, 10, 10, 9, 8, 7, 6, 5, 4, 3, 2, 11};
 std::default_random_engine Shoe::rng = std::default_random_engine {std::random_device{}()};
 
-Shoe::Shoe(int _num_decks) : Deck() {
-    num_decks = _num_decks;
+Shoe::Shoe(int num_decks) : Deck() {
+    this->num_decks = num_decks;
 
-    switch (num_decks) {
+    switch (this->num_decks) {
     case 1:
-        cards = one_deck;
+        this->cards = this->one_deck;
         break;
     case 2:
-        cards = two_decks;
+        this->cards = this->two_decks;
         break;
     case 4:
-        cards = four_decks;
+        this->cards = this->four_decks;
         break;
     case 6:
-        cards = six_decks;
+        this->cards = this->six_decks;
         break;
     case 8:
-        cards = eight_decks;
+        this->cards = this->eight_decks;
         break;
     default:
-        for(int i = 0; i < num_decks; i++) {
-            cards.insert(cards.end(), one_deck.begin(), one_deck.end());
+        for(int i = 0; i < this->num_decks; i++) {
+            this->cards.insert(this->cards.end(), this->one_deck.begin(), this->one_deck.end());
         }
         break;
     }
@@ -44,28 +44,28 @@ Shoe::Shoe(int _num_decks) : Deck() {
     shuffle();
 }
 
-Shoe::Shoe(int _num_decks, bool shuffled) : Deck() {
-    num_decks = _num_decks;
+Shoe::Shoe(int num_decks, bool shuffled) : Deck() {
+    this->num_decks = num_decks;
 
-    switch (num_decks) {
+    switch (this->num_decks) {
     case 1:
-        cards = one_deck;
+        cards = this->one_deck;
         break;
     case 2:
-        cards = two_decks;
+        cards = this->two_decks;
         break;
     case 4:
-        cards = four_decks;
+        cards = this->four_decks;
         break;
     case 6:
-        cards = six_decks;
+        cards = this->six_decks;
         break;
     case 8:
-        cards = eight_decks;
+        cards = this->eight_decks;
         break;
     default:
-        for(int i = 0; i < num_decks; i++) {
-            cards.insert(cards.end(), one_deck.begin(), one_deck.end());
+        for(int i = 0; i < this->num_decks; i++) {
+            this->cards.insert(this->cards.end(), this->one_deck.begin(), this->one_deck.end());
         }
         break;
     }
@@ -74,5 +74,5 @@ Shoe::Shoe(int _num_decks, bool shuffled) : Deck() {
 }
 
 void Shoe::shuffle() {
-    std::shuffle(std::begin(cards), std::end(cards), rng);
+    std::shuffle(std::begin(this->cards), std::end(this->cards), rng);
 }

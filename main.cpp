@@ -1,8 +1,8 @@
-// TODO in ALL files: add "this" to all classes
 // TODO in ALL files: add pointer prefix to all classes
 // TODO: add pointer prefixes
 // TODO: test everything EXTENSIVELY!!!
 // TODO: fix all for loops with auto
+// TODO: rename statistics variables
 // IO
 #include <iostream>
 #include <iomanip>

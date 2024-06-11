@@ -8,7 +8,7 @@
 constexpr inline float BLACKJACK_PAYOUT = 1.5;
 // Number of decks in play
 // (e.g., if 2, Double Deck)
-constexpr inline int MAX_DECKS = 1;
+constexpr inline int MAX_DECKS = 6;
 // If player can late surrender
 // note: early surrender takes precedence over late surrender
 // (e.g., if early and late are both true, player can early surrender)

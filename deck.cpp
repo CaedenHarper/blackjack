@@ -5,19 +5,16 @@
 #include <iostream>
 #include <vector>
 
-Deck :: Deck() {
-    cards = std::vector<int>();
+Deck::Deck() {
+    this->cards = std::vector<int>();
 }
 
-Deck :: Deck(int _card) {
-    cards = {_card};
+Deck::Deck(int card) {
+    this->cards = {card};
 }
 
-int Deck :: operator [](int i) const {
-    if(cards.size() < 1) {
-        std::cout << "EMPTY DECK ERROR" << "\n";
-    }
-    return cards[i];
+int Deck::operator [](int i) const {
+    return this->cards.at(i);
 }
 
 std::ostream& operator<<(std::ostream &out, const Deck &deck) {
@@ -26,7 +23,7 @@ std::ostream& operator<<(std::ostream &out, const Deck &deck) {
         return out;
     }
 
-    // TODO: consider changing writing A instead of 11 method
+    // TODO: consider refactoring
     // write A instead of 11
     if(deck[0] == 11) {
         out << "[" << "A";
@@ -46,25 +43,25 @@ std::ostream& operator<<(std::ostream &out, const Deck &deck) {
     return out;
 }
 
-int Deck :: size() const {
-    return cards.size();
+int Deck::size() const {
+    return this->cards.size();
 }
 
-void Deck :: clear() {
-    cards.clear();
+void Deck::clear() {
+    this->cards.clear();
 }
 
-void Deck :: insert(int index, const int& val) {
-    std::vector<int>::iterator it = cards.begin();
-    cards.insert((it + index), val);
+void Deck::insert(int index, const int& val) {
+    std::vector<int>::iterator it = this->cards.begin();
+    this->cards.insert((it + index), val);
 }
 
-void Deck :: push_back(const int& val) {
-    cards.push_back(val);
+void Deck::push_back(const int& val) {
+    this->cards.push_back(val);
 }
 
-int Deck :: pop_back() {
-    int out = cards.back();
-    cards.pop_back();
+int Deck::pop_back() {
+    int out = this->cards.back();
+    this->cards.pop_back();
     return out;
 }
