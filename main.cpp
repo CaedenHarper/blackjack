@@ -1,4 +1,3 @@
-// TODO in ALL files: add pointer prefix to all classes
 // TODO: add pointer prefixes
 // TODO: test everything EXTENSIVELY!!!
 // TODO: fix all for loops with auto
