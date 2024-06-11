@@ -17,6 +17,14 @@ int Deck::at(int i) const {
     return this->cards.at(i);
 }
 
+std::vector<int>::iterator Deck::begin() {
+    return this->cards.begin();
+}
+
+std::vector<int>::iterator Deck::end() {
+    return this->cards.end();
+}
+
 std::ostream& operator<<(std::ostream &out, const Deck &deck) {
     if(deck.size() == 0) {
         out << "[]";

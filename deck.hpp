@@ -12,6 +12,8 @@ class Deck {
     Deck();
     Deck(int card);
     int at(int i) const;
+    std::vector<int>::iterator begin();
+    std::vector<int>::iterator end();
     friend std::ostream& operator<<(std::ostream &out, const Deck &deck);
     int size() const;
     void clear();

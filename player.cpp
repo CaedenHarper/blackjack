@@ -18,6 +18,14 @@ Hand Player::at(int i) const {
     return this->hands.at(i);
 }
 
+std::vector<Hand>::iterator Player::begin() {
+    return this->hands.begin();
+}
+
+std::vector<Hand>::iterator Player::end() {
+    return this->hands.end();
+}
+
 std::ostream& operator<<(std::ostream &out, const Player &player) {
     if(player.size() == 0) {
         out << "{}";

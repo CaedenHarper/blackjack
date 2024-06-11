@@ -1,3 +1,4 @@
+// TOOD: consider creating dealer class
 // TODO: test everything EXTENSIVELY!!!
 // TODO: fix all for loops with auto
 // IO
@@ -75,7 +76,7 @@ int main() {
             // exit loop if no active hands
             if(current_index == -1) break;
 
-            // TODO: replace with player.at()
+            // note: player.hands.at() instead of player.at() because player.at() does not return const
             Hand* p_current_hand = &player.hands.at(current_index);
 
             // if card was split aces, only allow one more card before de-activating
@@ -183,11 +184,10 @@ int main() {
         if(DEBUG) std::cout << "--WINNING LOOP--" << "\n";
         int dealer_final_value = dealer.get_value();
         // player winning/losing loop
-        for(int i = 0; i < player.hands.size(); i++) {
+        for(Hand hand : player) {
             num_rounds++;
             num_hands++;
-            // TODO: replace with player.at()
-            Hand* p_hand = &player.hands.at(i);
+            Hand* p_hand = &hand;
             int value = p_hand->get_value();
             bool player_blackjack = p_hand->is_blackjack();
             bool player_bust = p_hand->is_bust();

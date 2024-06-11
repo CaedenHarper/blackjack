@@ -15,6 +15,8 @@ class Player {
 
     Player();
     Hand at(int i) const;
+    std::vector<Hand>::iterator begin();
+    std::vector<Hand>::iterator end();
     friend std::ostream& operator<<(std::ostream &out, const Player &player);
     int size() const;
     int add(Shoe& shoe);
