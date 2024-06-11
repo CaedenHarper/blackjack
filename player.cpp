@@ -218,13 +218,24 @@ int Player::get_value(int index) {
 // Returns list of all active hands indices
 // TODO: consider transforming into get_first_active_index() for speed increase,
 // as only the first active index is ever actually needed in main.cpp
-std::vector<int> Player::get_active_indices() {
-    std::vector<int> out;
+// std::vector<int> Player::get_active_indices() {
+//     std::vector<int> out;
+//     for(int i = 0; i < this->hands.size(); i++) {
+//         Hand hand = this->hands.at(i);
+//         if(hand.get_active()) out.push_back(i);
+//     }
+//     return out;
+// }
+
+// Returns first active index or -1 if there are no active indeces
+int Player::get_first_active_index() {
     for(int i = 0; i < this->hands.size(); i++) {
         Hand hand = this->hands.at(i);
-        if(hand.get_active()) out.push_back(i);
+        if(hand.get_active()) {
+            return i;
+        }
     }
-    return out;
+    return -1;
 }
 
 // Returns true if all hands have busted

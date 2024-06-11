@@ -70,13 +70,12 @@ int main() {
         if(DEBUG) std::cout << "--PLAYER LOOP--" << "\n";
         // main round loop
         while(true) {
+            // init current index
+            int current_index = player.get_first_active_index();
+
             // exit loop if no active hands
-            std::vector<int> active_indices = player.get_active_indices();
+            if(current_index == -1) break;
 
-            if(active_indices.size() == 0) break;
-
-            // init current values
-            int current_index = active_indices.at(0);
             // TODO:
             // For some reason player.hands[index] is required because
             // player[index] throws an error even though player[index] simply returns

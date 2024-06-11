@@ -31,7 +31,7 @@ class Player {
     int surrender(int index);
     int get_value();
     int get_value(int index);
-    std::vector<int> get_active_indices();
+    int get_first_active_index();
     bool all_busted();
     bool all_blackjacks();
 };
