@@ -16,6 +16,14 @@ void wait_for_input() {
     std::getchar();
 }
 
+void print_hand(Hand const player_hand, int const dealer_upcard) {
+    if(player_hand.get_soft()) {
+        std::cout << "Soft " << player_hand.get_value() << " vs. " << dealer_upcard << "\n";
+    } else {
+        std::cout << player_hand.get_value() << " vs. " << dealer_upcard << "\n";
+    }
+}
+
 void test() {
     Shoe shoe = Shoe(1, true);
 
@@ -26,10 +34,11 @@ void test() {
     }
 
     std::cout<<"TEST SHOE PRINTOUT"<<"\n";
-    for(int i = 0; i < shoe.size(); i++) {
+    for(int i = shoe.size()-1; i >= 0; i--) {
         int value = shoe[i];
         std::cout<<value<<"\n";
         card_frequency[value]++;
+        wait_for_input();
     }
     std::cout<<"SHOE SIZE: "<<shoe.size()<<"\n";
 
@@ -107,6 +116,7 @@ void test() {
                     break;
                 }
                 player.add(shoe, current_index);
+                print_hand(*p_current_hand, dealer_upcard);
 
                 p_current_hand->set_split_aces_final_card(false);
                 p_current_hand->set_active(false);
@@ -131,7 +141,7 @@ void test() {
 
             int player_value = player.get_value(current_index);
             
-            std::cout << player_value << " vs " << dealer_upcard << "\n";
+            print_hand(*p_current_hand, dealer_upcard);
 
             // handle blackjacks
             if(dealer_init_value == 21) {
@@ -176,7 +186,7 @@ void test() {
                     break;
                 }
                 player.double_down(shoe, current_index);
-                std::cout << player.get_value(current_index) << " vs " << dealer_upcard << "\n";
+                print_hand(*p_current_hand, dealer_upcard);
                 break;
             case action::split:
                 std::cout << "SPLIT\n";
@@ -208,7 +218,10 @@ void test() {
             action dealer_action = dealer_strategy(*p_dealer_hand);
 
             // exit loop if dealer stands
-            if(dealer_action == action::stand) break;
+            if(dealer_action == action::stand) {
+                std::cout << "DEALER STAND\n";
+                break;
+            }
 
             if(is_shoe_empty(shoe)) {
                 std::cout << "SHOE EMPTY; DISREGARD HAND\n";
@@ -217,7 +230,11 @@ void test() {
             dealer.hit(shoe);
 
             // exit loop if dealer busts
-            if(p_dealer_hand->is_bust()) break;
+            if(p_dealer_hand->is_bust()) {
+                std::cout << dealer.get_value() << "\n";
+                std::cout << "DEALER BUST\n";
+                break;
+            }
         }
         int dealer_final_value = dealer.get_value();
         // player winning/losing loop
