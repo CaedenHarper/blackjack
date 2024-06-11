@@ -1,7 +1,5 @@
-// TODO: add pointer prefixes
 // TODO: test everything EXTENSIVELY!!!
 // TODO: fix all for loops with auto
-// TODO: rename statistics variables
 // IO
 #include <iostream>
 #include <iomanip>
@@ -33,13 +31,14 @@ int main() {
     const int PENETRATION_CARDS = ONE_DECK_SIZE * MAX_DECKS * PENETRATON_PERCENT;
 
     // Statistic variables
-    int total_hands = 0;
-    int total = 0;
-    int win = 0;
-    int loss = 0;
-    int draw = 0;
-    int player_blackjacks = 0;
-    int dealer_blackjacks = 0;
+    int num_rounds = 0;
+    // num_hands includes hands created from splits; num_rounds does not
+    int num_hands = 0;
+    int num_wins = 0;
+    int num_losses = 0;
+    int num_draws = 0;
+    int num_player_blackjacks = 0;
+    int num_dealer_blackjacks = 0;
 
     // Total player profit
     // TODO: replace with bankroll, bet spread, true count, etc.
@@ -47,7 +46,7 @@ int main() {
 
 
     // Simulation loop
-    while(total_hands < MAX_HANDS) {
+    while(num_rounds < MAX_HANDS) {
         if(shoe.size() <= PENETRATION_CARDS) shoe = Shoe(MAX_DECKS);  
         // Player variables
         Player player = Player();
@@ -146,7 +145,7 @@ int main() {
                 // reset pointer.. shouldn't need to be here, but here in case
                 p_current_hand = &player.hands[current_index];
 
-                total_hands--;
+                num_rounds--;
                 break;
             case action::surrender:
                 if(DEBUG) std::cout << "SURRENDER! " << player << " -> ";
@@ -189,8 +188,8 @@ int main() {
         int dealer_final_value = dealer.get_value();
         // player winning/losing loop
         for(int i = 0; i < player.hands.size(); i++) {
-            total_hands++;
-            total++;
+            num_rounds++;
+            num_hands++;
             // TODO:
             // For some reason player.hands[index] is required because
             // player[index] throws an error even though player[index] simply returns
@@ -209,17 +208,17 @@ int main() {
             // winner logic
             // push
             if(dealer_blackjack && player_blackjack) {
-                draw++;
-                dealer_blackjacks++;
-                player_blackjacks++;
+                num_draws++;
+                num_dealer_blackjacks++;
+                num_player_blackjacks++;
                 if(DEBUG) std::cout << "TWO BLACKJACKS" << "\n";
                 continue;
             }
             
-            // loss
+            // num_losses
             if(dealer_blackjack) {
-                loss++;
-                dealer_blackjacks++;
+                num_losses++;
+                num_dealer_blackjacks++;
                 
                 player_profit -= money_magnitude;
 
@@ -228,10 +227,10 @@ int main() {
                 continue;
             }
 
-            // win
+            // num_wins
             if(player_blackjack) {
-                win++;
-                player_blackjacks++;
+                num_wins++;
+                num_player_blackjacks++;
         
                 player_profit += money_magnitude*BLACKJACK_PAYOUT;
     
@@ -240,9 +239,9 @@ int main() {
                 continue;
             }
 
-            // loss
+            // num_losses
             if(player_bust) {
-                loss++;
+                num_losses++;
 
                 player_profit -= money_magnitude;
 
@@ -251,9 +250,9 @@ int main() {
                 continue;
             }
 
-            // win
+            // num_wins
             if(dealer[0].is_bust()) {
-                win++;
+                num_wins++;
 
                 player_profit += money_magnitude;
 
@@ -264,14 +263,14 @@ int main() {
 
             // push
             if(dealer_final_value == value) {
-                draw++;
+                num_draws++;
                 if(DEBUG) std::cout << "STANDARD PUSH" << "\n";
                 continue;
             }
             
-            // win
+            // num_wins
             if(dealer_final_value < value) {
-                win++;
+                num_wins++;
 
                 player_profit += money_magnitude;
 
@@ -280,9 +279,9 @@ int main() {
                 continue;
             }
 
-            // loss
+            // num_losses
             if(dealer_final_value > value) {
-                loss++;
+                num_losses++;
 
                 player_profit -= money_magnitude;
 
@@ -305,17 +304,17 @@ int main() {
         std::cout << std::fixed;
         std::cout << std::setprecision(2);
         
-        std::cout << "TOTAL = " << total << "\n\n";
+        std::cout << "TOTAL = " << num_hands << "\n\n";
         
-        std::cout << "WINS = " << win << " -> " << win*1.0/total * 100 << "%\n";
-        std::cout << "LOSS = " << loss << " -> " << loss*1.0/total * 100 << "%\n";
-        std::cout << "DRAWS = " << draw << " -> " << draw*1.0/total * 100 << "%\n\n";
+        std::cout << "WINS = " << num_wins << " -> " << num_wins*1.0/num_hands * 100 << "%\n";
+        std::cout << "LOSS = " << num_losses << " -> " << num_losses*1.0/num_hands * 100 << "%\n";
+        std::cout << "DRAWS = " << num_draws << " -> " << num_draws*1.0/num_hands * 100 << "%\n\n";
 
-        std::cout << "DEALER BJs = " << dealer_blackjacks << " -> " << dealer_blackjacks*1.0/total * 100 << "%\n";
-        std::cout << "PLAYER BJs = " << player_blackjacks << " -> " << player_blackjacks*1.0/total * 100 << "%\n\n";
+        std::cout << "DEALER BJs = " << num_dealer_blackjacks << " -> " << num_dealer_blackjacks*1.0/num_hands * 100 << "%\n";
+        std::cout << "PLAYER BJs = " << num_player_blackjacks << " -> " << num_player_blackjacks*1.0/num_hands * 100 << "%\n\n";
         
         float profit = BETTING_UNIT * player_profit;
-        float profit_per_hour = (profit) / (total*1.0 / HANDS_PER_HOUR);
+        float profit_per_hour = (profit) / (num_hands*1.0 / HANDS_PER_HOUR);
 
         // define sign chars to print dollar sign prettier
         // e.g., -$400 instead of $-400
