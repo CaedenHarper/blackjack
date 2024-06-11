@@ -1,4 +1,5 @@
 // TODO: test everything EXTENSIVELY!!!
+// TODO: replace all [] operator use with .at()
 // TODO: fix all for loops with auto
 // IO
 #include <iostream>
