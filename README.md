@@ -4,4 +4,6 @@ Blackjack Simulator is a simulator designed to test Blackjack strategies written
 
 ## Usage
 
-Edit the simulation settings in `settings.hpp`, then run with `make`.
+Edit the simulation settings in `settings.hpp`, then compile with `make`.
+
+Run with `./main.exe`
